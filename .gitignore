@@ -1,0 +1,4 @@
+.vscode
+_output
+bin
+.generate_exes

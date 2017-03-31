@@ -1,0 +1,22 @@
+package: github.com/openshift/brokersdk
+import:
+- package: github.com/coreos/etcd
+- package: github.com/ghodss/yaml
+- package: github.com/gorilla/handlers
+- package: github.com/gorilla/mux
+- package: github.com/satori/go.uuid
+- package: github.com/jteeuwen/go-bindata
+- package: github.com/spf13/cobra
+  version: f62e98d28ab7ad31d707ba837a966378465c7b57
+- package: k8s.io/gengo
+  subpackages:
+  - args
+- package: github.com/kubernetes/repo-infra
+- package: k8s.io/kubernetes
+- package: k8s.io/client-go
+- package: k8s.io/apimachinery
+- package: k8s.io/apiserver
+- package: github.com/ugorji/go
+  subpackages:
+  - codec/codecgen
+- package: github.com/golang/glog
