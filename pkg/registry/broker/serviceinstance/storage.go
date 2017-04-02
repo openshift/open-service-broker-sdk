@@ -17,9 +17,8 @@ limitations under the License.
 package serviceinstance
 
 import (
-	"errors"
-
 	"k8s.io/apimachinery/pkg/runtime"
+
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
@@ -27,73 +26,7 @@ import (
 	"github.com/openshift/brokersdk/pkg/apis/broker"
 )
 
-var (
-	errNotAnInstance = errors.New("not an instance")
-)
-
-/*
-// NewStorage creates a new rest.Storage for each of Instances and
-// Status of Instances
-//func NewStorage(opts generic.RESTOptions) (rest.Storage, rest.Storage) {
-func NewStorage(opts generic.RESTOptions) rest.Storage {
-	prefix := "/" + opts.ResourcePrefix
-
-	newListFunc := func() runtime.Object { return &broker.ServiceInstanceList{} }
-	newKeyFunc := func(obj runtime.Object) (string, error) { return obj.(*broker.ServiceInstance).Name, nil }
-	storageInterface, dFunc := opts.Decorator(
-		runtime.NewScheme(),
-		opts.StorageConfig,
-		1000,
-		&broker.ServiceInstance{},
-		prefix,
-		newKeyFunc,
-		newListFunc,
-		nil,
-		storage.NoTriggerPublisher,
-	)
-
-	store := registry.Store{
-		NewFunc: func() runtime.Object {
-			return &broker.ServiceInstance{}
-		},
-		// NewListFunc returns an object capable of storing results of an etcd list.
-		NewListFunc: newListFunc,
-		// Produces a path that etcd understands, to the root of the resource
-		// by combining the namespace in the context with the given prefix
-		KeyRootFunc: func(ctx request.Context) string {
-			return registry.NamespaceKeyRootFunc(ctx, prefix)
-		},
-		// Produces a path that etcd understands, to the resource by combining
-		// the namespace in the context with the given prefix
-		KeyFunc: func(ctx request.Context, name string) (string, error) {
-			return registry.NamespaceKeyFunc(ctx, prefix, name)
-		},
-		// Retrieve the name field of the resource.
-		ObjectNameFunc: func(obj runtime.Object) (string, error) {
-			return obj.(*broker.ServiceInstance).Name, nil
-		},
-		// Used to match objects based on labels/fields for list.
-		PredicateFunc: Match,
-		// QualifiedResource should always be plural
-		QualifiedResource: api.Resource("instances"),
-
-		CreateStrategy: instanceRESTStrategies,
-		UpdateStrategy: instanceRESTStrategies,
-		DeleteStrategy: instanceRESTStrategies,
-
-		Storage:     storageInterface,
-		DestroyFunc: dFunc,
-	}
-
-	//statusStore := store
-	//statusStore.UpdateStrategy = instanceStatusUpdateStrategy
-
-	//return &store, &statusStore
-	return &store
-}
-*/
-
-// NewREST returns a RESTStorage object that will work against API services.
+// NewREST returns a RESTStorage object that will work against broker API resources.
 func NewREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGetter) rest.Storage {
 	strategy := NewStrategy(scheme)
 
@@ -105,7 +38,7 @@ func NewREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGetter) rest.
 			return obj.(*broker.ServiceInstance).Name, nil
 		},
 		PredicateFunc:     MatchServiceInstance,
-		QualifiedResource: broker.Resource("serviceinstance"),
+		QualifiedResource: broker.Resource(broker.ServiceInstanceResource),
 
 		CreateStrategy: strategy,
 		UpdateStrategy: strategy,
@@ -113,7 +46,7 @@ func NewREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGetter) rest.
 	}
 	options := &generic.StoreOptions{RESTOptions: optsGetter, AttrFunc: GetAttrs}
 	if err := store.CompleteWithOptions(options); err != nil {
-		panic(err) // TODO: Propagate error up
+		panic(err)
 	}
 	return store
 }

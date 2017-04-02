@@ -55,7 +55,7 @@ func (apiServerStrategy) PrepareForUpdate(ctx genericapirequest.Context, obj, ol
 
 func (apiServerStrategy) Validate(ctx genericapirequest.Context, obj runtime.Object) field.ErrorList {
 	return field.ErrorList{}
-	// return validation.ValidateFlunder(obj.(*wardle.Flunder))
+	// return validation.ValidateServiceInstance(obj.(*brokerapi.ServiceInstance))
 }
 
 func (apiServerStrategy) AllowCreateOnUpdate() bool {
@@ -71,7 +71,7 @@ func (apiServerStrategy) Canonicalize(obj runtime.Object) {
 
 func (apiServerStrategy) ValidateUpdate(ctx genericapirequest.Context, obj, old runtime.Object) field.ErrorList {
 	return field.ErrorList{}
-	// return validation.ValidateFlunderUpdate(obj.(*wardle.Flunder), old.(*wardle.Flunder))
+	// return validation.ValidateServiceInstanceUpdate(obj.(*brokerapi.ServiceInstance), old.(*brokerapi.ServiceInstance))
 }
 
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
@@ -82,7 +82,7 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	return labels.Set(apiserver.ObjectMeta.Labels), ServiceInstanceToSelectableFields(apiserver), nil
 }
 
-// MatchFlunder is the filter used by the generic etcd backend to watch events
+// MatchServiceInstance is the filter used by the generic etcd backend to watch events
 // from etcd to clients of the apiserver only interested in specific labels/fields.
 func MatchServiceInstance(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
@@ -92,7 +92,7 @@ func MatchServiceInstance(label labels.Selector, field fields.Selector) storage.
 	}
 }
 
-// FlunderToSelectableFields returns a field set that represents the object.
+// ServiceInstanceToSelectableFields returns a field set that represents the object.
 func ServiceInstanceToSelectableFields(obj *brokerapi.ServiceInstance) fields.Set {
 	return generic.ObjectMetaFieldsSet(&obj.ObjectMeta, true)
 }

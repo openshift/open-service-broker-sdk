@@ -20,12 +20,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+
+	"github.com/openshift/brokersdk/pkg/apis/broker"
 )
 
-const GroupName = "generic.broker.k8s.io"
-
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
+var SchemeGroupVersion = schema.GroupVersion{Group: broker.GroupName, Version: APIGroupVersion}
 
 var (
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)

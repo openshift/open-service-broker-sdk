@@ -17,7 +17,7 @@ curl \
   -H 'Content-Type: application/json' \
   -d "$req" \
   $curlargs \
-  $endpoint/broker/my.broker.io/v2/service_instances/$instanceUUID
+  $endpoint/broker/sdkbroker.broker.io/v2/service_instances/$instanceUUID
 echo
-curl $curlargs $endpoint/apis/generic.broker.k8s.io/v1alpha1/namespaces/brokersdk/serviceinstances
+curl $curlargs $endpoint/apis/sdkbroker.broker.k8s.io/v1alpha1/namespaces/brokersdk/serviceinstances
 echo

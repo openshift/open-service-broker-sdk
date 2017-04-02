@@ -77,9 +77,34 @@ type ServiceInstanceCondition struct {
 type ServiceInstanceConditionType string
 
 const (
-	// ServiceInstanceReady indicates the readiness of the template
-	// instantiation.
+	// ServiceInstanceReady indicates the service instance is Ready for use
+	// (provision was successful)
 	ServiceInstanceReady ServiceInstanceConditionType = "Ready"
-	// ServiceInstanceInstantiateFailed indicates the failure of the provision request
+
+	// ServiceInstanceInstantiateFailed indicates the provision request failed.
 	ServiceInstanceFailed ServiceInstanceConditionType = "Failure"
+
+	// TypePackage is the name of the package that defines the resource types
+	// used by this broker.
+	TypePackage = "github.com/openshift/brokersdk/pkg/apis/broker"
+
+	// GroupName is the name of the api group used for resources created/managed
+	// by this broker.
+	GroupName = "sdkbroker.broker.k8s.io"
+
+	// ServiceInstancesResource is the name of the resource used to represent
+	// provision requests(possibly fulfilled) for service instances
+	ServiceInstancesResource = "serviceinstances"
+
+	// ServiceInstanceResource is the name of the resource used to represent
+	// provision requests(possibly fulfilled) for service instances
+	ServiceInstanceResource = "serviceinstance"
+
+	// BrokerAPIPrefix is the route prefix for the open service broker api
+	// endpoints (e.g. https://yourhost.com/broker/sdkbroker.broker.io/v2/catalog)
+	BrokerAPIPrefix = "/broker/sdkbroker.broker.io"
+
+	// Namespace is the namespace the broker will be deployed in and
+	// under which it will create any resources
+	Namespace = "brokersdk"
 )

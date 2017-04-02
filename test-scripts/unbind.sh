@@ -6,5 +6,5 @@ curl \
   -X DELETE \
   -H 'X-Broker-API-Version: 2.9' \
   $curlargs \
-  $endpoint/broker/my.broker.io/v2/service_instances/$instanceUUID/service_bindings/$bindingUUID
+  $endpoint/broker/sdkbroker.broker.io/v2/service_instances/$instanceUUID/service_bindings/$bindingUUID
 echo

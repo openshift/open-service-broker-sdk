@@ -38,7 +38,7 @@ items:
     name: service-broker-caller
   rules:
   - nonResourceURLs:
-    - /broker/my.broker.io/*
+    - /broker/sdkbroker.broker.io/*
     verbs:
     - get
     - put
@@ -60,7 +60,7 @@ items:
     name: service-broker-resource
   rules:
   - apiGroups:
-    - generic.broker.k8s.io
+    - sdkbroker.broker.k8s.io
     resources:
     - "*"
     verbs:

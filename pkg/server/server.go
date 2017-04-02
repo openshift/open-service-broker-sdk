@@ -66,9 +66,6 @@ const (
 	// are any restrictions on the format or structure beyond text
 	// separated by slashes.
 	etcdPathPrefix = "/k8s.io/brokersdk"
-
-	// GroupName I made this up. Maybe we'll need it.
-	GroupName = "brokersdk.k8s.io"
 )
 
 // NewCommandServer creates a new cobra command to run our server.
@@ -78,12 +75,10 @@ func NewCommandServer(out io.Writer) *cobra.Command {
 	options := &BrokerServerOptions{
 		RecommendedOptions:      recommended,
 		GenericServerRunOptions: genericserveroptions.NewServerRunOptions(),
-		//ServingOptions:          genericserveroptions.NewInsecureServingOptions(),
-		ServingOptions:        genericserveroptions.NewSecureServingOptions(),
-		EtcdOptions:           recommended.Etcd,
-		AuthenticationOptions: genericserveroptions.NewDelegatingAuthenticationOptions(),
-		AuthorizationOptions:  genericserveroptions.NewDelegatingAuthorizationOptions(),
-		//InsecureServingOptions:  genericserveroptions.NewInsecureServingOptions(),
+		ServingOptions:          genericserveroptions.NewSecureServingOptions(),
+		EtcdOptions:             recommended.Etcd,
+		AuthenticationOptions:   genericserveroptions.NewDelegatingAuthenticationOptions(),
+		AuthorizationOptions:    genericserveroptions.NewDelegatingAuthorizationOptions(),
 	}
 
 	// Set generated SSL cert path correctly
@@ -101,52 +96,30 @@ func NewCommandServer(out io.Writer) *cobra.Command {
 	// themselves. Each options adds its own command line flags
 	// in addition to the flags that are defined above.
 	flags := cmd.Flags()
-	// TODO consider an AddFlags() method on our options
-	// struct. Will need to import pflag.
-	//
-	// repeated pattern seems like it should be refactored if all
-	// options were of an interface type that specified AddFlags.
+
 	flags.AddGoFlagSet(flag.CommandLine)
 	options.RecommendedOptions.AddFlags(flags)
 	return cmd
 }
 
-// RunServer is a method on the options for composition. Allows embedding in a
-// higher level options as we do the etcd and serving options.
 func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error {
-	glog.V(4).Infof("Preparing to run API server")
+	glog.V(4).Infof("Preparing to run the broker API server")
 
 	// server configuration options
 	glog.V(4).Infoln("Setting up secure serving options")
 	if err := serverOptions.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", net.ParseIP("127.0.0.1")); err != nil {
-
-		//if err := serverOptions.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts(serverOptions.GenericServerRunOptions.AdvertiseAddress.String()); err != nil {
 		glog.Errorf("Error creating self-signed certificates: %v", err)
 		return err
 	}
 
-	// config
 	glog.V(4).Infoln("Configuring generic API server")
 	genericconfig := genericapiserver.NewConfig().WithSerializer(apiserver.Codecs)
 
-	//serverOptions.GenericServerRunOptions.ApplyTo(genericconfig)
-	//serverOptions.ServingOptions.ApplyTo(genericconfig)
 	serverOptions.RecommendedOptions.ApplyTo(genericconfig)
-	//serverOptions.EtcdOptions.ApplyTo(genericconfig)
 
 	// audit logging
 	genericconfig.AuditWriter = os.Stdout
 
-	// these are all mutators of each specific suboption in serverOptions object.
-	// this repeated pattern seems like we could refactor
-	/*
-		if _, err := genericconfig.ApplySecureServingOptions(serverOptions.SecureServingOptions); err != nil {
-			glog.Errorln(err)
-			return err
-		}
-
-		genericconfig.ApplyInsecureServingOptions(serverOptions.InsecureServingOptions)
-	*/
 	glog.V(4).Info("Setting up authn (disabled)")
 	// need to figure out what's throwing the `missing clientCA file` err
 	/*
@@ -174,16 +147,15 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 	completedconfig := config.Complete()
 
 	// make the server
-	glog.V(4).Infoln("Completing API server configuration")
+	glog.V(4).Infoln("Completing broker API server configuration")
 	server, err := completedconfig.New()
-	glog.Infof("complete, error=%v", err)
 	if err != nil {
 		return fmt.Errorf("error completing API server configuration: %v", err)
 	}
 
-	// I don't like this. We're reaching in too far to call things.
-	preparedserver := server.GenericAPIServer.PrepareRun() // post api installation setup? We should have set up the api already?
+	preparedserver := server.GenericAPIServer.PrepareRun()
 
+	// setup the controller that will watch for and process service instance resource objects
 	brokerClient, err := clientset.NewForConfig(server.GenericAPIServer.LoopbackClientConfig)
 	if err != nil {
 		glog.Errorf("could not get broker client: %v", err)
@@ -197,7 +169,7 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 		controller.Run(stopCh)
 	}()
 
-	glog.Infof("Running the API server")
+	glog.Infof("Running the broker API server")
 	preparedserver.Run(stopCh)
 
 	return nil

@@ -83,4 +83,6 @@ const (
 	ServiceInstanceReady ServiceInstanceConditionType = "Ready"
 	// ServiceInstanceInstantiateFailed indicates the failure of the provision request
 	ServiceInstanceFailed ServiceInstanceConditionType = "Failed"
+
+	APIGroupVersion = "v1alpha1"
 )

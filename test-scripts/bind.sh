@@ -16,5 +16,5 @@ curl \
   -H 'Content-Type: application/json' \
   -d "$req" \
   $curlargs \
-  $endpoint/broker/my.broker.io/v2/service_instances/$instanceUUID/service_bindings/$bindingUUID
+  $endpoint/broker/sdkbroker.broker.io/v2/service_instances/$instanceUUID/service_bindings/$bindingUUID
 echo

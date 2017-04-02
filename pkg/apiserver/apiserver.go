@@ -51,10 +51,8 @@ func init() {
 	install.Install(groupFactoryRegistry, registry, Scheme)
 
 	// we need to add the options to empty v1
-	// TODO fix the server code to avoid this
 	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Version: "v1"})
 
-	// TODO: keep the generic API server from wanting this
 	unversioned := schema.GroupVersion{Group: "", Version: "v1"}
 	Scheme.AddUnversionedTypes(unversioned,
 		&metav1.Status{},
@@ -65,27 +63,20 @@ func init() {
 	)
 }
 
-// ServiceCatalogAPIServer contains the base GenericAPIServer along with other
+// BrokerAPIServer contains the base GenericAPIServer along with other
 // configured runtime configuration
-type ServiceCatalogAPIServer struct {
+type BrokerAPIServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
 }
 
 // Config contains a generic API server Config along with config specific to
-// the service catalog API server.
+// the broker API server.
 type Config struct {
 	GenericConfig *genericapiserver.Config
-
-	// BABYNETES: cargo culted from master.go
-	/*
-		APIResourceConfigSource genericapiserverstorage.APIResourceConfigSource
-		DeleteCollectionWorkers int
-		StorageFactory          genericapiserverstorage.StorageFactory
-	*/
 }
 
 // CompletedConfig is an internal type to take advantage of typechecking in
-// the type system. mhb does not like it.
+// the type system.
 type CompletedConfig struct {
 	*Config
 }
@@ -96,81 +87,52 @@ func (c *Config) Complete() CompletedConfig {
 	c.GenericConfig.Complete()
 
 	version := version.Get()
-	// Setting this var enables the version resource. We should populate the
-	// fields of the object from above if we wish to have our own output. Or
-	// establish our own version object somewhere else.
+	// Setting this var enables the version resource.
 	c.GenericConfig.Version = &version
 
 	return CompletedConfig{c}
 }
 
 // New creates the server to run.
-func (c CompletedConfig) New() (*ServiceCatalogAPIServer, error) {
+func (c CompletedConfig) New() (*BrokerAPIServer, error) {
 	// we need to call new on a "completed" config, which we
 	// should already have, as this is a 'CompletedConfig' and the
 	// only way to get here from there is by Complete()'ing. Thus
 	// we skip the complete on the underlying config and go
-	// straight to running it's New() method.
+	// straight to running its New() method.
 	genericServer, err := c.Config.GenericConfig.SkipComplete().New()
 	if err != nil {
 		return nil, err
 	}
 
-	glog.V(4).Infoln("Creating API server")
+	glog.V(4).Infoln("Creating the Broker API server")
 
-	s := &ServiceCatalogAPIServer{
+	s := &BrokerAPIServer{
 		GenericAPIServer: genericServer,
 	}
 
-	// Not every API group compiled in is necessarily enabled by the operator
-	// at runtime.
-	//
 	// Install the API resource config source, which describes versions of
 	// which API groups are enabled.
-	//c.APIResourceConfigSource = DefaultAPIResourceConfigSource()
-
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(broker.GroupName, registry, Scheme, metav1.ParameterCodec, Codecs)
 	apiGroupInfo.GroupMeta.GroupVersion = v1alpha1.SchemeGroupVersion
 	v1alpha1storage := map[string]rest.Storage{}
-	v1alpha1storage["serviceinstances"] = serviceinstance.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter)
-	apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
-	/*
-		storageConfig, _ := c.StorageFactory.NewConfig(broker.Resource("serviceinstance"))
-		opts := generic.RESTOptions{
-			StorageConfig:           storageConfig,
-			Decorator:               generic.UndecoratedStorage,
-			DeleteCollectionWorkers: c.DeleteCollectionWorkers,
-			//EnableGarbageCollection: c.GenericConfig.EnableGarbageCollection,
-			ResourcePrefix: c.StorageFactory.ResourcePrefix(broker.Resource("serviceinstance")),
-		}
-		v1alpha1storage["serviceinstance"] = serviceinstance.NewStorage(opts)
-
-		apiGroupInfo.VersionedResourcesStorageMap["v1alpha1"] = v1alpha1storage
-	*/
+	v1alpha1storage[broker.ServiceInstancesResource] = serviceinstance.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter)
+	apiGroupInfo.VersionedResourcesStorageMap[v1alpha1.APIGroupVersion] = v1alpha1storage
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		return nil, err
 	}
+	glog.Infoln("Finished installing API groups")
 
-	/*
-		kubeconfig, err := clientcmd.BuildConfigFromFlags("https://127.0.0.1:443", "")
-		if err != nil {
-			glog.Errorf("Failed to create a kube config\n:%v\n", err)
-
-		}
-
-		kubeconfig.Insecure = true
-	*/
-
-	//brokerClient, err := clientset.NewForConfig(kubeconfig)
+	glog.Info("Installing service broker api endpoints at %s", broker.BrokerAPIPrefix)
+	// Create a client to talk to our apiserver using the loopback address
+	// since we are in the same process as the api server.
 	brokerClient, err := clientset.NewForConfig(s.GenericAPIServer.LoopbackClientConfig)
 
-	// install the broker spec apis
-	//s.GenericAPIServer.HandlerContainer.Add
-	broker := &operations.BrokerOperations{Client: brokerClient}
-	openservicebroker.Route(s.GenericAPIServer.HandlerContainer.Container, "/broker/my.broker.io", broker)
-
-	glog.Infoln("Finished installing API groups")
+	// install the open service broker spec api routes
+	brokerOps := &operations.BrokerOperations{Client: brokerClient}
+	openservicebroker.Route(s.GenericAPIServer.HandlerContainer.Container, broker.BrokerAPIPrefix, brokerOps)
+	glog.Info("Finished installing broker api endpoints")
 
 	return s, nil
 }

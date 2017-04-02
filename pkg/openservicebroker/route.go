@@ -12,13 +12,16 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// minimum supported client version
+// minimum supported client version for the service broker api version
 const minAPIVersionMajor, minAPIVersionMinor = 2, 7
 
+// Route sets up the service broker api endpoints.
 func Route(container *restful.Container, path string, b Broker) {
+
+	// shim does some basic boiler plate handling of all requests before handing the request
+	// off to the api specific function.
 	shim := func(f func(Broker, *restful.Request) *Response) func(*restful.Request, *restful.Response) {
 		return func(req *restful.Request, resp *restful.Response) {
-			fmt.Printf("got request %#v\n", *req)
 			response := f(b, req)
 			if response.Err != nil {
 				resp.WriteHeaderAndJson(response.Code, &ErrorResponse{Description: response.Err.Error()}, restful.MIME_JSON)
@@ -29,11 +32,13 @@ func Route(container *restful.Container, path string, b Broker) {
 	}
 
 	ws := restful.WebService{}
+	// v2 is a required part of the service broker api request path.
 	ws.Path(path + "/v2")
 	ws.Consumes(restful.MIME_JSON)
 	ws.Produces(restful.MIME_JSON)
 	ws.Filter(apiVersion)
 
+	// register the various service broker api paths
 	ws.Route(ws.GET("/catalog").To(shim(catalog)))
 	ws.Route(ws.PUT("/service_instances/{instance_id}").To(shim(provision)))
 	ws.Route(ws.DELETE("/service_instances/{instance_id}").To(shim(deprovision)))
@@ -51,6 +56,7 @@ func atoi(s string) int {
 	return rv
 }
 
+// apiVersion ensures that the request is using a supported service broker api version.
 func apiVersion(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	versions := strings.SplitN(req.HeaderParameter(XBrokerAPIVersion), ".", 3)
 	if len(versions) != 2 || atoi(versions[0]) != minAPIVersionMajor || atoi(versions[1]) < minAPIVersionMinor {
@@ -60,26 +66,31 @@ func apiVersion(req *restful.Request, resp *restful.Response, chain *restful.Fil
 	chain.ProcessFilter(req, resp)
 }
 
+// catalog hands the request off to the BrokerOperations catalog implementation
 func catalog(b Broker, req *restful.Request) *Response {
 	return b.Catalog()
 }
 
+// provision hands the request off to the BrokerOperations provision implementation
 func provision(b Broker, req *restful.Request) *Response {
+	// grab the instance id of the provision request
 	instance_id := req.PathParameter("instance_id")
-	glog.Infof("processing provision for %s", instance_id)
 
-	/*
-		if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
-			return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
-		}
-	*/
+	glog.Infof("processing provision request for %s", instance_id)
+
+	// make sure it's a valid uuid
+	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
+		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
+	}
+
 	var preq ProvisionRequest
-
 	err := req.ReadEntity(&preq)
 	if err != nil {
 		return &Response{http.StatusBadRequest, nil, err}
 	}
 
+	// this broker performs asynchronous provisioning, so the client must
+	// indicate that it will accept incomplete(async) provision responses.
 	if !preq.AcceptsIncomplete {
 		return &Response{http.StatusUnprocessableEntity, AsyncRequired, nil}
 	}
@@ -87,13 +98,20 @@ func provision(b Broker, req *restful.Request) *Response {
 	return b.Provision(instance_id, &preq)
 }
 
+// deprovision hands the request off to the BrokerOperations deprovision implementation
 func deprovision(b Broker, req *restful.Request) *Response {
+	// this broker performs asynchronous deprovisioning, so the client must
+	// indicate it supports an async response.
 	if req.QueryParameter("accepts_incomplete") != "true" {
 		return &Response{http.StatusUnprocessableEntity, &AsyncRequired, nil}
 	}
 
+	// grab the service instance id we are deprovisioning
 	instance_id := req.PathParameter("instance_id")
 
+	glog.Infof("processing deprovision request for %s", instance_id)
+
+	// make sure it's a valid uuid
 	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
@@ -101,8 +119,14 @@ func deprovision(b Broker, req *restful.Request) *Response {
 	return b.Deprovision(instance_id)
 }
 
+// lastOperation hands the request off to the BrokerOperations lastoperation implementation
 func lastOperation(b Broker, req *restful.Request) *Response {
+
+	// get the service instance id who's state is being requested
 	instance_id := req.PathParameter("instance_id")
+
+	glog.Infof("processing lastoperation request for %s", instance_id)
+
 	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
@@ -117,11 +141,19 @@ func lastOperation(b Broker, req *restful.Request) *Response {
 	return b.LastOperation(instance_id, operation)
 }
 
+// bind hands the request off to the BrokerOperations bind implementation
 func bind(b Broker, req *restful.Request) *Response {
+
+	// get the service instance id we're binding to
 	instance_id := req.PathParameter("instance_id")
+
+	glog.Infof("processing bind request for %s", instance_id)
+
 	errors := ValidateUUID(field.NewPath("instance_id"), instance_id)
 
+	// get the id for the binding that will be created
 	binding_id := req.PathParameter("binding_id")
+	glog.Infof("with binding id %s", binding_id)
 	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), binding_id)...)
 
 	if len(errors) > 0 {
@@ -137,11 +169,19 @@ func bind(b Broker, req *restful.Request) *Response {
 	return b.Bind(instance_id, binding_id, &breq)
 }
 
+// unbind hands the request off to the BrokerOperations unbind implementation
 func unbind(b Broker, req *restful.Request) *Response {
+
+	// get the service instance id we are unbinding from
 	instance_id := req.PathParameter("instance_id")
+
+	glog.Infof("processing unbind request for %s", instance_id)
+
 	errors := ValidateUUID(field.NewPath("instance_id"), instance_id)
 
+	// get the id of the binding we are removing
 	binding_id := req.PathParameter("binding_id")
+	glog.Infof("with binding id %s", binding_id)
 	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), binding_id)...)
 
 	if len(errors) > 0 {

@@ -30,7 +30,7 @@ func Install(groupFactoryRegistry announced.APIGroupFactoryRegistry, registry *r
 		&announced.GroupMetaFactoryArgs{
 			GroupName:                  broker.GroupName,
 			VersionPreferenceOrder:     []string{v1alpha1.SchemeGroupVersion.Version},
-			ImportPrefix:               "github.com/openshift/brokersdk/pkg/apis/broker",
+			ImportPrefix:               broker.TypePackage,
 			AddInternalObjectsToScheme: broker.AddToScheme,
 		},
 		announced.VersionToSchemeFunc{

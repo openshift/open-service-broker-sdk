@@ -30,12 +30,13 @@ import (
 
 	"k8s.io/kubernetes/pkg/api/unversioned"
 
+	"github.com/openshift/brokersdk/pkg/apis/broker"
 	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
 	brokerclientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
 )
 
-// Controller describes a controller that backs the service catalog API for
-// Open Service Broker compliant Brokers.
+// Controller describes a controller that processes service instance
+// provision requests for the broker.
 type Controller interface {
 	// Run runs the controller until the given stop channel can be read from.
 	Run(stopCh <-chan struct{})
@@ -47,27 +48,29 @@ type controller struct {
 	informer     cache.Controller
 }
 
-// NewController returns a new Open Service Broker catalog
-// controller.
-func NewController(
-	brokerClient brokerclientset.Clientset,
-) (Controller, error) {
+// NewController returns a new Open Service Broker provision controller.
+func NewController(brokerClient brokerclientset.Clientset) (Controller, error) {
 
 	controller := &controller{
 		brokerClient: brokerClient,
 	}
 
+	// setup an informer that will tell us about new/updated/deleted ServiceInstance objects.
+	// (we don't actually do anything w/ updated objects in this controller)
 	_, controller.informer = cache.NewInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
-				return brokerClient.ServiceInstances("brokersdk").List(options)
+				return brokerClient.ServiceInstances(broker.Namespace).List(options)
 			},
 			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
-				return brokerClient.ServiceInstances("brokersdk").Watch(options)
+				return brokerClient.ServiceInstances(broker.Namespace).Watch(options)
 			},
 		},
+		// the resource type we're watching
 		&brokerapi.ServiceInstance{},
-		0,
+		// how often to resync (re-list) all resources
+		2*time.Minute,
+		// what to call do resources are added/deleted
 		cache.ResourceEventHandlerFuncs{
 			AddFunc:    controller.serviceInstanceAdd,
 			DeleteFunc: controller.serviceInstanceDelete,
@@ -82,13 +85,18 @@ func (c *controller) Run(stopCh <-chan struct{}) {
 	c.informer.Run(stopCh)
 }
 
-// ServiceInstance handlers
+// serviceInstanceAdd handles added ServiceInstances.
+// It will update the service instance to indicate it has
+// been successfully provisioned/is ready for use.
+// A real broker could use this to create any backing
+// service resources needed to run the service instance.
 func (c *controller) serviceInstanceAdd(obj interface{}) {
 	instance, ok := obj.(*brokerapi.ServiceInstance)
 	if instance == nil || !ok {
 		return
 	}
-	glog.Infof("controller sees instance %s", instance.Name)
+	glog.Infof("controller processing provision request for instance %s", instance.Name)
+	// add the Ready condition to the service instance.
 	condition := brokerapi.ServiceInstanceCondition{
 		Type:               brokerapi.ServiceInstanceReady,
 		Status:             kapi.ConditionTrue,
@@ -101,15 +109,17 @@ func (c *controller) serviceInstanceAdd(obj interface{}) {
 	if err != nil {
 		glog.Errorf("Error updating service instance %s to ready: %v", instance.Name, err)
 	}
-
-	//	c.reconcileInstance(instance)
 }
 
+// serviceInstanceDelete handles deleted ServiceInstances
+// Currently there is no action that needs to be taken when
+// a service instance is deleted, but a real controller could
+// use this to tear down the backing service resources.
 func (c *controller) serviceInstanceDelete(obj interface{}) {
 	instance, ok := obj.(*brokerapi.ServiceInstance)
 	if instance == nil || !ok {
 		return
 	}
+	glog.Infof("controller processing deprovision request for instance %s", instance.Name)
 
-	//	c.reconcileInstance(instance)
 }

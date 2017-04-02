@@ -6,11 +6,15 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/openshift/brokersdk/pkg/apis/broker"
 	"github.com/openshift/brokersdk/pkg/openservicebroker"
 )
 
+// Bind handles bind requests from the service catalog by returning
+// a bind response with credentials for the service instance.
 func (b *BrokerOperations) Bind(instance_id, binding_id string, breq *openservicebroker.BindRequest) *openservicebroker.Response {
-	si, err := b.Client.ServiceInstances("brokersdk").Get(instance_id, metav1.GetOptions{})
+	// Find the service instance that is being bound to
+	si, err := b.Client.ServiceInstances(broker.Namespace).Get(instance_id, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return &openservicebroker.Response{http.StatusGone, &openservicebroker.BindResponse{}, nil}
@@ -18,11 +22,13 @@ func (b *BrokerOperations) Bind(instance_id, binding_id string, breq *openservic
 		return &openservicebroker.Response{http.StatusInternalServerError, nil, err}
 	}
 
-	// TODO: in principle, bind should alter state somewhere
+	// in principle, bind should alter state somewhere
 
+	// Create some credentials to return.  In this case the credentials are
+	// pulled from the service instance but a real broker might
+	// return unique credentials for each binding so that multiple users
+	// of a service instance are not sharing credentials.
 	credentials := map[string]interface{}{}
-	// TODO: confirm this API
-	// TODO: we're somewhat overloading 'credentials' here
 	credentials["credential"] = si.Spec.Credential
 
 	return &openservicebroker.Response{

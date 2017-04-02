@@ -2,11 +2,14 @@ package openservicebroker
 
 // from https://github.com/openservicebrokerapi/servicebroker/blob/1d301105c66187b5aa2e061a1264ecf3cbc3d2a0/_spec.md
 
+/* These types represent the open service broker api spec */
+
 const (
 	XBrokerAPIVersion = "X-Broker-Api-Version"
 	APIVersion        = "2.11"
 )
 
+// Service is an available service listed in the catalog
 type Service struct {
 	Name            string                 `json:"name"`
 	ID              string                 `json:"id"`
@@ -26,6 +29,7 @@ type DashboardClient struct {
 	RedirectURI string `json:"redirect_uri"`
 }
 
+// Plan is a plan within a service offering
 type Plan struct {
 	ID          string                 `json:"id"`
 	Name        string                 `json:"name"`
@@ -35,10 +39,12 @@ type Plan struct {
 	Bindable    bool                   `json:"bindable,omitempty"`
 }
 
+// CatalogResponse is sent as the response to catalog requests
 type CatalogResponse struct {
 	Services []*Service `json:"services"`
 }
 
+// LastOperationResponse is sent as a response to last operation requests
 type LastOperationResponse struct {
 	State       LastOperationState `json:"state"`
 	Description string             `json:"description,omitempty"`
@@ -52,6 +58,7 @@ const (
 	LastOperationStateFailed     LastOperationState = "failed"
 )
 
+// ProvisionRequest is sent as part of a provision api call
 type ProvisionRequest struct {
 	ServiceID         string            `json:"service_id"`
 	PlanID            string            `json:"plan_id"`
@@ -61,6 +68,7 @@ type ProvisionRequest struct {
 	SpaceID           string            `json:"space_guid"`
 }
 
+// ProvisionResponse is sent in response to a provision call
 type ProvisionResponse struct {
 	DashboardURL string    `json:"dashboard_url,omitempty"`
 	Operation    Operation `json:"operation,omitempty"`
@@ -85,6 +93,7 @@ type UpdateResponse struct {
 	Operation Operation `json:"operation,omitempty"`
 }
 
+// BindRequest is sent as part of a bind api call
 type BindRequest struct {
 	ServiceID    string `json:"service_id"`
 	PlanID       string `json:"plan_id"`
@@ -96,6 +105,7 @@ type BindRequest struct {
 	Parameters map[string]string `json:"parameters,omitempty"`
 }
 
+// BindResponse is sent in response to a bind api call
 type BindResponse struct {
 	Credentials     map[string]interface{} `json:"credentials,omitempty"`
 	SyslogDrainURL  string                 `json:"syslog_drain_url,omitempty"`
@@ -103,9 +113,11 @@ type BindResponse struct {
 	VolumeMounts    []interface{}          `json:"volume_mounts,omitempty"`
 }
 
+// UnbindResponse is sent in response to an unbind call
 type UnbindResponse struct {
 }
 
+// DeprovisionResponse is sent in response to a deprovision call
 type DeprovisionResponse struct {
 	Operation Operation `json:"operation,omitempty"`
 }

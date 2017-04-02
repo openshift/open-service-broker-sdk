@@ -6,6 +6,8 @@ import (
 	"github.com/openshift/brokersdk/pkg/openservicebroker"
 )
 
+// Catalog is an implementation of the service broker catalog endpoint.
+// This implementation returns a static set of services and plans.
 func (b *BrokerOperations) Catalog() *openservicebroker.Response {
 
 	services := make([]*openservicebroker.Service, 1)
@@ -30,6 +32,5 @@ func (b *BrokerOperations) Catalog() *openservicebroker.Response {
 		Metadata:    service_metadata,
 		Plans:       service_plans,
 	}
-	// return &openservicebroker.Response{http.StatusInternalServerError, nil, err}
 	return &openservicebroker.Response{http.StatusOK, &openservicebroker.CatalogResponse{Services: services}, nil}
 }
