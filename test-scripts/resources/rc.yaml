@@ -15,16 +15,28 @@ spec:
         apiserver: "true"
     spec:
       serviceAccountName: brokersdk
+      volumes:
+      - name: etcd-data
+        emptyDir: {}
+      - name: brokersdk-data
+        emptyDir: {}
       containers:
       - name: brokersdk
         image: brokersdk
         imagePullPolicy: Never
+        volumeMounts:
+         - name: brokersdk-data
+           mountPath: /data
         args:
         - "--etcd-servers=http://localhost:2379"
         - "--authentication-skip-lookup"
-        securityContext:
-          runAsUser: 0
+        - "--cert-dir=/data"
+        - "--secure-port=8443"
       - name: etcd
         image: quay.io/coreos/etcd:v3.0.17
-        securityContext:
-          runAsUser: 0
+        volumeMounts:
+         - name: etcd-data
+           mountPath: /data
+        args:
+        - "/usr/local/bin/etcd"
+        - "--data-dir=/data"

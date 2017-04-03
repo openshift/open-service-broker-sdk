@@ -60,7 +60,7 @@ type BrokerServerOptions struct {
 const (
 	// Store generated SSL certificates in a place that won't collide with the
 	// k8s core API server.
-	certDirectory = "/var/run/brokersdk"
+	//certDirectory = "/data"
 
 	// I made this up to match some existing paths. I am not sure if there
 	// are any restrictions on the format or structure beyond text
@@ -103,16 +103,15 @@ func NewCommandServer(out io.Writer) *cobra.Command {
 }
 
 func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error {
-	glog.V(4).Infof("Preparing to run the broker API server")
+	glog.Info("Preparing to run the broker API server")
 
 	// server configuration options
-	glog.V(4).Infoln("Setting up secure serving options")
+	glog.Info("Setting up secure serving options")
 	if err := serverOptions.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", net.ParseIP("127.0.0.1")); err != nil {
 		glog.Errorf("Error creating self-signed certificates: %v", err)
 		return err
 	}
-
-	glog.V(4).Infoln("Configuring generic API server")
+	glog.V(4).Info("Configuring generic API server")
 	genericconfig := genericapiserver.NewConfig().WithSerializer(apiserver.Codecs)
 
 	serverOptions.RecommendedOptions.ApplyTo(genericconfig)
@@ -129,7 +128,7 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 		}
 	*/
 
-	glog.V(4).Infoln("Setting up authz (disabled)")
+	glog.V(4).Info("Setting up authz (disabled)")
 	// having this enabled causes the server to crash for any call
 	/*
 		if _, err := genericconfig.ApplyDelegatingAuthorizationOptions(serverOptions.AuthorizationOptions); err != nil {
@@ -147,7 +146,7 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 	completedconfig := config.Complete()
 
 	// make the server
-	glog.V(4).Infoln("Completing broker API server configuration")
+	glog.V(4).Info("Completing broker API server configuration")
 	server, err := completedconfig.New()
 	if err != nil {
 		return fmt.Errorf("error completing API server configuration: %v", err)
@@ -170,7 +169,10 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 	}()
 
 	glog.Infof("Running the broker API server")
-	preparedserver.Run(stopCh)
+	err = preparedserver.Run(stopCh)
+	if err != nil {
+		glog.Errorf("could not start api server: %v", err)
+	}
 
 	return nil
 }

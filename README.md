@@ -13,7 +13,7 @@ skeleton that is provided.
 ```
 $ make images
 $ start up an openshift/kube cluster
-$ have admin credentials
+$ have permission to create new projects
 $ cd test-scripts
 $ ./install-broker.sh
 $ ./provision.sh

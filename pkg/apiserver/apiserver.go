@@ -105,7 +105,7 @@ func (c CompletedConfig) New() (*BrokerAPIServer, error) {
 		return nil, err
 	}
 
-	glog.V(4).Infoln("Creating the Broker API server")
+	glog.Info("Creating the Broker API server")
 
 	s := &BrokerAPIServer{
 		GenericAPIServer: genericServer,
@@ -122,9 +122,9 @@ func (c CompletedConfig) New() (*BrokerAPIServer, error) {
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		return nil, err
 	}
-	glog.Infoln("Finished installing API groups")
+	glog.Info("Finished installing API groups")
 
-	glog.Info("Installing service broker api endpoints at %s", broker.BrokerAPIPrefix)
+	glog.Infof("Installing service broker api endpoints at %s", broker.BrokerAPIPrefix)
 	// Create a client to talk to our apiserver using the loopback address
 	// since we are in the same process as the api server.
 	brokerClient, err := clientset.NewForConfig(s.GenericAPIServer.LoopbackClientConfig)

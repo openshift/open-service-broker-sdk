@@ -19,8 +19,5 @@ oadm policy add-cluster-role-to-user system:auth-delegator -n ${targetNamespace}
 oc create policybinding kube-system -n kube-system
 oadm policy add-role-to-user extension-apiserver-authentication-reader -n kube-system --role-namespace=kube-system system:serviceaccount:${targetNamespace}:brokersdk
 
-# allow us to run the broker pods as root.
-oadm policy add-scc-to-user anyuid -z brokersdk
-
 # Create the brokersdk replication controller
 oc create -f resources/rc.yaml
