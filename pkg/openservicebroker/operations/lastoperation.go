@@ -7,10 +7,9 @@ import (
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	kapi "k8s.io/client-go/pkg/api/v1"
+	kapi "k8s.io/client-go/pkg/api"
 
-	broker "github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
+	"github.com/openshift/brokersdk/pkg/apis/broker"
 	"github.com/openshift/brokersdk/pkg/openservicebroker"
 )
 
@@ -39,10 +38,10 @@ func (b *BrokerOperations) LastOperation(instance_id string, operation openservi
 	// so it's in progress.  Otherwise there will be a ready or failed condition present.
 	state := openservicebroker.LastOperationStateInProgress
 	for _, condition := range si.Status.Conditions {
-		if condition.Type == brokerapi.ServiceInstanceReady && condition.Status == kapi.ConditionTrue {
+		if condition.Type == broker.ServiceInstanceReady && condition.Status == kapi.ConditionTrue {
 			state = openservicebroker.LastOperationStateSucceeded
 		}
-		if condition.Type == brokerapi.ServiceInstanceFailed && condition.Status == kapi.ConditionTrue {
+		if condition.Type == broker.ServiceInstanceFailed && condition.Status == kapi.ConditionTrue {
 			state = openservicebroker.LastOperationStateFailed
 		}
 	}

@@ -18,5 +18,5 @@ limitations under the License.
 // +k8s:conversion-gen=github.com/openshift/brokersdk/pkg/apis/broker
 
 // Package v1alpha1 is the v1alpha1 version of the API.
-// +groupName=generic.broker.openshift.io
+// +groupName=sdkbroker.broker.k8s.io
 package v1alpha1

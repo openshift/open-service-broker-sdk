@@ -28,7 +28,7 @@ type BrokerV1alpha1Interface interface {
 	ServiceInstancesGetter
 }
 
-// BrokerV1alpha1Client is used to interact with features provided by the generic.broker.openshift.io group.
+// BrokerV1alpha1Client is used to interact with features provided by the sdkbroker.broker.k8s.io group.
 type BrokerV1alpha1Client struct {
 	restClient rest.Interface
 }

@@ -34,7 +34,7 @@ import (
 	"github.com/openshift/brokersdk/pkg/apis/broker"
 	"github.com/openshift/brokersdk/pkg/apis/broker/install"
 	"github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
+	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
 	"github.com/openshift/brokersdk/pkg/openservicebroker"
 	"github.com/openshift/brokersdk/pkg/openservicebroker/operations"
 	"github.com/openshift/brokersdk/pkg/registry/broker/serviceinstance"

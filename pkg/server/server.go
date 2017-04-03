@@ -33,7 +33,7 @@ import (
 
 	"github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
 	"github.com/openshift/brokersdk/pkg/apiserver"
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
+	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
 	"github.com/openshift/brokersdk/pkg/controller"
 )
 
