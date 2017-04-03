@@ -17,5 +17,5 @@ limitations under the License.
 // +k8s:deepcopy-gen=package,register
 
 // Package api is the internal version of the API.
-// +groupName=generic.broker.openshift.io
+// +groupName=sdkbroker.broker.k8s.io
 package broker

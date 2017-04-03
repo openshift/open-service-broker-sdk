@@ -6,7 +6,7 @@ import (
 	"github.com/golang/glog"
 
 	broker "github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
+	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker"
 	"github.com/openshift/brokersdk/pkg/openservicebroker"
 )
 

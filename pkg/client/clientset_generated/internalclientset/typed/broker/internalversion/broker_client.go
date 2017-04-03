@@ -26,7 +26,7 @@ type BrokerInterface interface {
 	ServiceInstancesGetter
 }
 
-// BrokerClient is used to interact with features provided by the generic.broker.openshift.io group.
+// BrokerClient is used to interact with features provided by the sdkbroker.broker.k8s.io group.
 type BrokerClient struct {
 	restClient rest.Interface
 }
@@ -64,7 +64,7 @@ func New(c rest.Interface) *BrokerClient {
 }
 
 func setConfigDefaults(config *rest.Config) error {
-	g, err := scheme.Registry.Group("generic.broker.openshift.io")
+	g, err := scheme.Registry.Group("sdkbroker.broker.k8s.io")
 	if err != nil {
 		return err
 	}

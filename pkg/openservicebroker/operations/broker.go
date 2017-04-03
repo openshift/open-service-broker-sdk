@@ -1,7 +1,7 @@
 package operations
 
 import (
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
+	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
 )
 
 // BrokerOperations provides the implementation of the service broker

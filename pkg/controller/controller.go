@@ -25,14 +25,14 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 
-	kapi "k8s.io/client-go/pkg/api/v1"
+	kapi "k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/tools/cache"
 
 	"k8s.io/kubernetes/pkg/api/unversioned"
 
 	"github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	brokerclientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
+	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker"
+	brokerclientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
 )
 
 // Controller describes a controller that processes service instance
