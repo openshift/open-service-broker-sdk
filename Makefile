@@ -69,7 +69,6 @@ NON_VENDOR_DIRS = $(shell glide nv)
 # "apiserver" instead of "bin/apiserver".
 #########################################################################
 build: .init .generate_files broker
-#build: .init broker
 
 broker: $(BINDIR)/broker
 $(BINDIR)/broker: .init .generate_files $(NEWEST_GO_FILE)
@@ -136,9 +135,6 @@ $(BINDIR)/informer-gen: .init
 	# the previous three directories will be changed from kubernetes to apimachinery in the future
 	# generate all pkg/client contents
 	$(BUILD_DIR)/update-client-gen.sh
-	# generate codec
-#	$(DOCKER_CMD) $(BUILD_DIR)/update-codecgen.sh
-#	touch $@
 
 # Some prereq stuff
 ###################
@@ -185,23 +181,12 @@ verify-client-gen: .init .generate_files
 format: .init
 	gofmt -w -s $(TOP_SRC_DIRS)
 
-coverage: .init
-	contrib/hack/coverage.sh --html "$(COVERAGE)" \
-	  $(addprefix ./,$(TEST_DIRS))
-
-test: .init build test-unit test-integration
+test: .init build test-unit
 
 test-unit: .init build
 	@echo Running tests:
 	go test $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
-
-test-integration: .init build
-	# test kubectl
-	contrib/hack/setup-kubectl.sh
-	contrib/hack/test-apiserver.sh
-	# golang integration tests
-	test/integration.sh
 
 clean: clean-bin clean-deps clean-build-image clean-generated clean-coverage
 
@@ -211,17 +196,6 @@ clean-bin:
 
 clean-deps:
 	rm -f .init
-
-clean-build-image:
-	rm -f .scBuildImage
-	docker rmi -f scbuildimage > /dev/null 2>&1 || true
-
-clean-generated:
-	rm -f .generate_files
-	find $(TOP_SRC_DIRS) -name zz_generated* -exec rm {} \;
-
-clean-coverage:
-	rm -f $(COVERAGE)
 
 # Building Docker Images for our executables
 ############################################
