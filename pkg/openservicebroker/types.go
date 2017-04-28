@@ -5,8 +5,10 @@ package openservicebroker
 /* These types represent the open service broker api spec */
 
 const (
+	// XBrokerAPIVersion is the header for the openservice broker api versoin
 	XBrokerAPIVersion = "X-Broker-Api-Version"
-	APIVersion        = "2.11"
+	// APIVersion is the version of the openservice broker api supported by this broker
+	APIVersion = "2.11"
 )
 
 // Service is an available service listed in the catalog
@@ -23,6 +25,8 @@ type Service struct {
 	Plans           []Plan                 `json:"plans"`
 }
 
+// DashboardClient contains information about the oauth SSO
+// flow for the service dashboard
 type DashboardClient struct {
 	ID          string `json:"id"`
 	Secret      string `json:"secret"`

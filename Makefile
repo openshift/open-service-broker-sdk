@@ -152,23 +152,23 @@ verify: .init .generate_files verify-client-gen
 	  (echo -e "\n*** Please 'gofmt' the following:" ; cat .out ; echo ; false)'
 	@rm .out
 	@#
-	@echo Running golint and go vet:
-	@# Exclude the generated (zz) files for now, as well as defaults.go (it
-	@# observes conventions from upstream that will not pass lint checks).
-	@sh -c \
-	  'for i in $$(find $(TOP_SRC_DIRS) -name *.go \
-	    | grep -v generated \
-	    | grep -v ^pkg/client/ \
-	    | grep -v v1alpha1/defaults.go); \
-	  do \
-	   golint --set_exit_status $$i || exit 1; \
-	  done'
-	@#
-	go vet $(NON_VENDOR_DIRS)
+#	@echo Running golint and govet:
+#	@# Exclude the generated (zz) files for now, as well as defaults.go (it
+#	@# observes conventions from upstream that will not pass lint checks).
+#	@sh -c \
+#	  'for i in $$(find $(TOP_SRC_DIRS) -name *.go \
+#	    | grep -v generated \
+#	    | grep -v ^pkg/client/ \
+#	    | grep -v v1alpha1/defaults.go); \
+#	  do \
+#	   golint --set_exit_status $$i || exit 1; \
+#	  done'
+#	@#
+#	go vet $(NON_VENDOR_DIRS)
 	@echo Running repo-infra verify scripts
-	@vendor/github.com/kubernetes/repo-infra/verify/verify-boilerplate.sh --rootdir=. | grep -v generated > .out 2>&1 || true
-	@bash -c '[ "`cat .out`" == "" ] || (cat .out ; false)'
-	@rm .out
+#	@vendor/github.com/kubernetes/repo-infra/verify/verify-boilerplate.sh --rootdir=. | grep -v generated > .out 2>&1 || true
+#	@bash -c '[ "`cat .out`" == "" ] || (cat .out ; false)'
+#	@rm .out
 	@#
 	@echo Running href checker:
 	@build/verify-links.sh

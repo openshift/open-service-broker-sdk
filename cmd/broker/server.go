@@ -102,6 +102,7 @@ func NewCommandServer(out io.Writer) *cobra.Command {
 	return cmd
 }
 
+// RunServer starts up the generic api server
 func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error {
 	glog.Info("Preparing to run the broker API server")
 
