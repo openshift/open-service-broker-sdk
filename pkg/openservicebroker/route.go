@@ -74,12 +74,12 @@ func catalog(b Broker, req *restful.Request) *Response {
 // provision hands the request off to the BrokerOperations provision implementation
 func provision(b Broker, req *restful.Request) *Response {
 	// grab the instance id of the provision request
-	instance_id := req.PathParameter("instance_id")
+	instanceID := req.PathParameter("instance_id")
 
-	glog.Infof("processing provision request for %s", instance_id)
+	glog.Infof("processing provision request for %s", instanceID)
 
 	// make sure it's a valid uuid
-	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
+	if errors := ValidateUUID(field.NewPath("instance_id"), instanceID); errors != nil {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
 
@@ -95,7 +95,7 @@ func provision(b Broker, req *restful.Request) *Response {
 		return &Response{http.StatusUnprocessableEntity, AsyncRequired, nil}
 	}
 
-	return b.Provision(instance_id, &preq)
+	return b.Provision(instanceID, &preq)
 }
 
 // deprovision hands the request off to the BrokerOperations deprovision implementation
@@ -107,27 +107,27 @@ func deprovision(b Broker, req *restful.Request) *Response {
 	}
 
 	// grab the service instance id we are deprovisioning
-	instance_id := req.PathParameter("instance_id")
+	instanceID := req.PathParameter("instance_id")
 
-	glog.Infof("processing deprovision request for %s", instance_id)
+	glog.Infof("processing deprovision request for %s", instanceID)
 
 	// make sure it's a valid uuid
-	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
+	if errors := ValidateUUID(field.NewPath("instance_id"), instanceID); errors != nil {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
 
-	return b.Deprovision(instance_id)
+	return b.Deprovision(instanceID)
 }
 
 // lastOperation hands the request off to the BrokerOperations lastoperation implementation
 func lastOperation(b Broker, req *restful.Request) *Response {
 
 	// get the service instance id who's state is being requested
-	instance_id := req.PathParameter("instance_id")
+	instanceID := req.PathParameter("instance_id")
 
-	glog.Infof("processing lastoperation request for %s", instance_id)
+	glog.Infof("processing lastoperation request for %s", instanceID)
 
-	if errors := ValidateUUID(field.NewPath("instance_id"), instance_id); errors != nil {
+	if errors := ValidateUUID(field.NewPath("instance_id"), instanceID); errors != nil {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
 
@@ -138,23 +138,23 @@ func lastOperation(b Broker, req *restful.Request) *Response {
 		return &Response{http.StatusBadRequest, nil, fmt.Errorf("invalid operation")}
 	}
 
-	return b.LastOperation(instance_id, operation)
+	return b.LastOperation(instanceID, operation)
 }
 
 // bind hands the request off to the BrokerOperations bind implementation
 func bind(b Broker, req *restful.Request) *Response {
 
 	// get the service instance id we're binding to
-	instance_id := req.PathParameter("instance_id")
+	instanceID := req.PathParameter("instance_id")
 
-	glog.Infof("processing bind request for %s", instance_id)
+	glog.Infof("processing bind request for %s", instanceID)
 
-	errors := ValidateUUID(field.NewPath("instance_id"), instance_id)
+	errors := ValidateUUID(field.NewPath("instance_id"), instanceID)
 
 	// get the id for the binding that will be created
-	binding_id := req.PathParameter("binding_id")
-	glog.Infof("with binding id %s", binding_id)
-	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), binding_id)...)
+	bindingID := req.PathParameter("binding_id")
+	glog.Infof("with binding id %s", bindingID)
+	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), bindingID)...)
 
 	if len(errors) > 0 {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
@@ -166,27 +166,27 @@ func bind(b Broker, req *restful.Request) *Response {
 		return &Response{http.StatusBadRequest, nil, err}
 	}
 
-	return b.Bind(instance_id, binding_id, &breq)
+	return b.Bind(instanceID, bindingID, &breq)
 }
 
 // unbind hands the request off to the BrokerOperations unbind implementation
 func unbind(b Broker, req *restful.Request) *Response {
 
 	// get the service instance id we are unbinding from
-	instance_id := req.PathParameter("instance_id")
+	instanceID := req.PathParameter("instance_id")
 
-	glog.Infof("processing unbind request for %s", instance_id)
+	glog.Infof("processing unbind request for %s", instanceID)
 
-	errors := ValidateUUID(field.NewPath("instance_id"), instance_id)
+	errors := ValidateUUID(field.NewPath("instance_id"), instanceID)
 
 	// get the id of the binding we are removing
-	binding_id := req.PathParameter("binding_id")
-	glog.Infof("with binding id %s", binding_id)
-	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), binding_id)...)
+	bindingID := req.PathParameter("binding_id")
+	glog.Infof("with binding id %s", bindingID)
+	errors = append(errors, ValidateUUID(field.NewPath("binding_id"), bindingID)...)
 
 	if len(errors) > 0 {
 		return &Response{http.StatusBadRequest, nil, errors.ToAggregate()}
 	}
 
-	return b.Unbind(instance_id, binding_id)
+	return b.Unbind(instanceID, bindingID)
 }
