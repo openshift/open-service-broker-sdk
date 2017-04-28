@@ -10,6 +10,7 @@ skeleton that is provided.
 
 ## Running the example
 
+```
 $ make images
 $ start up an openshift/kube cluster
 $ have admin credentials
@@ -19,4 +20,4 @@ $ ./provision.sh
 $ ./bind.sh
 $ ./unbind.sh
 $ ./deprovision.sh
-
+```
