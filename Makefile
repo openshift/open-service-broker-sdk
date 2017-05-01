@@ -188,7 +188,7 @@ test-unit: .init build
 	go test $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
 
-clean: clean-bin clean-deps clean-build-image clean-generated clean-coverage
+clean: clean-bin clean-deps
 
 clean-bin:
 	rm -rf $(BINDIR)

@@ -19,7 +19,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
@@ -89,7 +88,7 @@ func (s serviceInstanceNamespaceLister) Get(name string) (*v1alpha1.ServiceInsta
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.NewNotFound(broker.Resource("serviceinstance"), name)
+		return nil, errors.NewNotFound(v1alpha1.Resource("serviceinstance"), name)
 	}
 	return obj.(*v1alpha1.ServiceInstance), nil
 }
