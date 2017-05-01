@@ -17,9 +17,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
-	brokerinternalversion "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
-	fakebrokerinternalversion "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion/fake"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset"
+	brokerinternalversion "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
+	fakebrokerinternalversion "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

@@ -17,7 +17,7 @@ limitations under the License.
 package fake
 
 import (
-	broker "github.com/openshift/brokersdk/pkg/apis/broker/install"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker/install"
 	announced "k8s.io/apimachinery/pkg/apimachinery/announced"
 	registered "k8s.io/apimachinery/pkg/apimachinery/registered"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -17,7 +17,7 @@ limitations under the License.
 package internalversion
 
 import (
-	"github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/scheme"
+	"github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

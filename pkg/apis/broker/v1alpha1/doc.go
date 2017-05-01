@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 // +k8s:deepcopy-gen=package,register
-// +k8s:conversion-gen=github.com/openshift/brokersdk/pkg/apis/broker
+// +k8s:conversion-gen=github.com/openshift/open-service-broker-sdk/pkg/apis/broker
 
 // Package v1alpha1 is the v1alpha1 version of the API.
 // +groupName=sdkbroker.broker.k8s.io

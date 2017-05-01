@@ -17,8 +17,8 @@ limitations under the License.
 package internalversion
 
 import (
-	broker "github.com/openshift/brokersdk/pkg/apis/broker"
-	scheme "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/scheme"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	scheme "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

@@ -17,7 +17,7 @@ limitations under the License.
 package fake
 
 import (
-	v1alpha1 "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1"
+	v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

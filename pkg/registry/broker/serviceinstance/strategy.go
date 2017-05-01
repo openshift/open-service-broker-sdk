@@ -31,7 +31,7 @@ import (
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
 
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker"
+	brokerapi "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 )
 
 type apiServerStrategy struct {

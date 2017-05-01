@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	broker_v1alpha1 "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
-	internalinterfaces "github.com/openshift/brokersdk/pkg/client/informers_generated/externalversions/internalinterfaces"
-	v1alpha1 "github.com/openshift/brokersdk/pkg/client/listers_generated/broker/v1alpha1"
+	broker_v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset"
+	internalinterfaces "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/externalversions/internalinterfaces"
+	v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/client/listers_generated/broker/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"

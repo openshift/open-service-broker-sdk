@@ -31,13 +31,13 @@ import (
 
 	"k8s.io/client-go/pkg/version"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
-	"github.com/openshift/brokersdk/pkg/apis/broker/install"
-	"github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
-	"github.com/openshift/brokersdk/pkg/openservicebroker"
-	"github.com/openshift/brokersdk/pkg/openservicebroker/operations"
-	"github.com/openshift/brokersdk/pkg/registry/broker/serviceinstance"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker/install"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker/operations"
+	"github.com/openshift/open-service-broker-sdk/pkg/registry/broker/serviceinstance"
 )
 
 var (

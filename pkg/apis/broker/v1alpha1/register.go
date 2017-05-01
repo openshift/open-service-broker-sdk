@@ -21,7 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 )
 
 // SchemeGroupVersion is group version used to register these objects

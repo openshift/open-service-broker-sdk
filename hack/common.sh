@@ -22,7 +22,7 @@ BROKER_OUTPUT_PKGDIR="${BROKER_OUTPUT}/pkgdir"
 BROKER_LOCAL_BINPATH="${BROKER_OUTPUT}/go/bin"
 BROKER_LOCAL_RELEASEPATH="${BROKER_OUTPUT}/releases"
 
-readonly BROKER_GO_PACKAGE=github.com/openshift/brokersdk
+readonly BROKER_GO_PACKAGE=github.com/openshift/open-service-broker-sdk
 readonly BROKER_GOPATH="${BROKER_OUTPUT}/go"
 
 readonly BROKER_CROSS_COMPILE_PLATFORMS=(

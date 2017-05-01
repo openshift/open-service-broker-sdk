@@ -18,7 +18,7 @@ package internalclientset
 
 import (
 	glog "github.com/golang/glog"
-	brokerinternalversion "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
+	brokerinternalversion "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

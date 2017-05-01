@@ -3,7 +3,7 @@ package operations
 import (
 	"net/http"
 
-	"github.com/openshift/brokersdk/pkg/openservicebroker"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
 )
 
 // Catalog is an implementation of the service broker catalog endpoint.

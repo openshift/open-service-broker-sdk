@@ -6,8 +6,8 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
-	"github.com/openshift/brokersdk/pkg/openservicebroker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
 )
 
 // Bind handles bind requests from the service catalog by returning

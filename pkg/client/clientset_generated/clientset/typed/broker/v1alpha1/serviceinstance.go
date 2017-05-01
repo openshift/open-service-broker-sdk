@@ -17,8 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	scheme "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset/scheme"
+	v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
+	scheme "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"

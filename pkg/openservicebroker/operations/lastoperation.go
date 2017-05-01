@@ -9,8 +9,8 @@ import (
 
 	kapi "k8s.io/client-go/pkg/api"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
-	"github.com/openshift/brokersdk/pkg/openservicebroker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
 )
 
 // LastOperation is an implementation of the service broker last operation api.

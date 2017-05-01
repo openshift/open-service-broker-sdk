@@ -19,7 +19,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	internalinterfaces "github.com/openshift/brokersdk/pkg/client/informers_generated/externalversions/internalinterfaces"
+	internalinterfaces "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/externalversions/internalinterfaces"
 )
 
 // Interface provides access to all the informers in this group version.

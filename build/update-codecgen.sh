@@ -43,7 +43,7 @@ generated_files=($(
     \) -name '*.generated.go' | LC_ALL=C sort -r))
 
 # We only work for deps within this prefix.
-my_prefix="github.com/openshift/brokersdk"
+my_prefix="github.com/openshift/open-service-broker-sdk"
 
 # Register function to be called on EXIT to remove codecgen
 # binary and also to touch the files that should be regenerated
@@ -150,7 +150,7 @@ for current in "${index[@]}"; do
   ${CODECGEN} -d 1234 -o "${base_generated_file}" "${base_file}"
   # Add boilerplate at the beginning of the generated file.
   sed 's/YEAR/2016/' "${initial_dir}/vendor/github.com/kubernetes/repo-infra/verify/boilerplate/boilerplate.go.txt" > "${base_generated_file}.tmp"
-  sed -i 's/github.com\/openshift\/brokersdk\/vendor\///' "${base_generated_file}"
+  sed -i 's/github.com\/openshift\/open-service-broker-sdk\/vendor\///' "${base_generated_file}"
   cat "${base_generated_file}" >> "${base_generated_file}.tmp"
   mv "${base_generated_file}.tmp" "${base_generated_file}"
   popd > /dev/null

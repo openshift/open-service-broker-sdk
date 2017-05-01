@@ -86,7 +86,7 @@ const (
 
 	// TypePackage is the name of the package that defines the resource types
 	// used by this broker.
-	TypePackage = "github.com/openshift/brokersdk/pkg/apis/broker"
+	TypePackage = "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 
 	// GroupName is the name of the api group used for resources created/managed
 	// by this broker.

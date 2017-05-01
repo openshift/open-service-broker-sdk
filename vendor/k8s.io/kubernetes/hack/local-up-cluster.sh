@@ -48,11 +48,11 @@ EVICTION_HARD=${EVICTION_HARD:-"memory.available<100Mi"}
 EVICTION_SOFT=${EVICTION_SOFT:-""}
 EVICTION_PRESSURE_TRANSITION_PERIOD=${EVICTION_PRESSURE_TRANSITION_PERIOD:-"1m"}
 
-# We disable cluster DNS by default because this script uses docker0 (or whatever
-# container bridge docker is currently using) and we don't know the IP of the
-# DNS pod to pass in as --cluster-dns. To set this up by hand, set this flag
-# and change DNS_SERVER_IP to the appropriate IP.
-ENABLE_CLUSTER_DNS=${KUBE_ENABLE_CLUSTER_DNS:-false}
+# This script uses docker0 (or whatever container bridge docker is currently using)
+# and we don't know the IP of the DNS pod to pass in as --cluster-dns.
+# To set this up by hand, set this flag and change DNS_SERVER_IP.
+# Note also that you need API_HOST (defined above) for correct DNS.
+ENABLE_CLUSTER_DNS=${KUBE_ENABLE_CLUSTER_DNS:-true}
 DNS_SERVER_IP=${KUBE_DNS_SERVER_IP:-10.0.0.10}
 DNS_DOMAIN=${KUBE_DNS_NAME:-"cluster.local"}
 KUBECTL=${KUBECTL:-cluster/kubectl.sh}
@@ -65,6 +65,12 @@ FEATURE_GATES=${FEATURE_GATES:-"AllAlpha=true"}
 STORAGE_BACKEND=${STORAGE_BACKEND:-"etcd3"}
 # enable swagger ui
 ENABLE_SWAGGER_UI=${ENABLE_SWAGGER_UI:-false}
+
+# enable kubernetes dashboard
+ENABLE_CLUSTER_DASHBOARD=${KUBE_ENABLE_CLUSTER_DASHBOARD:-false}
+
+# enable audit log
+ENABLE_APISERVER_BASIC_AUDIT=${ENABLE_APISERVER_BASIC_AUDIT:-false}
 
 # RBAC Mode options
 ALLOW_ANY_TOKEN=${ALLOW_ANY_TOKEN:-false}
@@ -179,14 +185,18 @@ set +e
 
 API_PORT=${API_PORT:-8080}
 API_SECURE_PORT=${API_SECURE_PORT:-6443}
+
+# WARNING: For DNS to work on most setups you should export API_HOST as the docker0 ip address,
 API_HOST=${API_HOST:-localhost}
 API_HOST_IP=${API_HOST_IP:-"127.0.0.1"}
 API_BIND_ADDR=${API_BIND_ADDR:-"0.0.0.0"}
+
 KUBELET_HOST=${KUBELET_HOST:-"127.0.0.1"}
 # By default only allow CORS for requests on localhost
 API_CORS_ALLOWED_ORIGINS=${API_CORS_ALLOWED_ORIGINS:-/127.0.0.1(:[0-9]+)?$,/localhost(:[0-9]+)?$}
 KUBELET_PORT=${KUBELET_PORT:-10250}
 LOG_LEVEL=${LOG_LEVEL:-3}
+LOG_DIR=${LOG_DIR:-"/tmp"}
 CONTAINER_RUNTIME=${CONTAINER_RUNTIME:-"docker"}
 CONTAINER_RUNTIME_ENDPOINT=${CONTAINER_RUNTIME_ENDPOINT:-""}
 IMAGE_SERVICE_ENDPOINT=${IMAGE_SERVICE_ENDPOINT:-""}
@@ -202,6 +212,7 @@ ENABLE_CONTROLLER_ATTACH_DETACH=${ENABLE_CONTROLLER_ATTACH_DETACH:-"true"} # cur
 # which should be able to be used as the CA to verify itself
 CERT_DIR=${CERT_DIR:-"/var/run/kubernetes"}
 ROOT_CA_FILE=${CERT_DIR}/server-ca.crt
+ROOT_CA_KEY=${CERT_DIR}/server-ca.key
 
 # name of the cgroup driver, i.e. cgroupfs or systemd
 if [[ ${CONTAINER_RUNTIME} == "docker" ]]; then
@@ -305,7 +316,7 @@ cleanup()
 {
   echo "Cleaning up..."
   # delete running images
-  # if [[ "${ENABLE_CLUSTER_DNS}" = true ]]; then
+  # if [[ "${ENABLE_CLUSTER_DNS}" == true ]]; then
   # Still need to figure why this commands throw an error: Error from server: client: etcd cluster is unavailable or misconfigured
   #     ${KUBECTL} --namespace=kube-system delete service kube-dns
   # And this one hang forever:
@@ -357,7 +368,7 @@ function start_etcd {
 }
 
 function set_service_accounts {
-    SERVICE_ACCOUNT_LOOKUP=${SERVICE_ACCOUNT_LOOKUP:-false}
+    SERVICE_ACCOUNT_LOOKUP=${SERVICE_ACCOUNT_LOOKUP:-true}
     SERVICE_ACCOUNT_KEY=${SERVICE_ACCOUNT_KEY:-/tmp/kube-serviceaccount.key}
     # Generate ServiceAccount key if needed
     if [[ ! -f "${SERVICE_ACCOUNT_KEY}" ]]; then
@@ -380,6 +391,24 @@ function start_apiserver {
 
     # This is the default dir and filename where the apiserver will generate a self-signed cert
     # which should be able to be used as the CA to verify itself
+
+    audit_arg=""
+    APISERVER_BASIC_AUDIT_LOG=""
+    if [[ "${ENABLE_APISERVER_BASIC_AUDIT:-}" = true ]]; then
+        # We currently only support enabling with a fixed path and with built-in log
+        # rotation "disabled" (large value) so it behaves like kube-apiserver.log.
+        # External log rotation should be set up the same as for kube-apiserver.log.
+        APISERVER_BASIC_AUDIT_LOG=/tmp/kube-apiserver-audit.log
+        audit_arg=" --audit-log-path=${APISERVER_BASIC_AUDIT_LOG}"
+        audit_arg+=" --audit-log-maxage=0"
+        audit_arg+=" --audit-log-maxbackup=0"
+        # Lumberjack doesn't offer any way to disable size-based rotation. It also
+        # has an in-memory counter that doesn't notice if you truncate the file.
+        # 2000000000 (in MiB) is a large number that fits in 31 bits. If the log
+        # grows at 10MiB/s (~30K QPS), it will rotate after ~6 years if apiserver
+        # never restarts. Please manually restart apiserver before this time.
+        audit_arg+=" --audit-log-maxsize=2000000000"
+    fi
 
     swagger_arg=""
     if [[ "${ENABLE_SWAGGER_UI}" = true ]]; then
@@ -435,8 +464,8 @@ function start_apiserver {
     kube::util::write_client_kubeconfig "${CONTROLPLANE_SUDO}" "${CERT_DIR}" "${ROOT_CA_FILE}" "${API_HOST}" "${API_SECURE_PORT}" kube-aggregator
 
 
-    APISERVER_LOG=/tmp/kube-apiserver.log
-    ${CONTROLPLANE_SUDO} "${GO_OUT}/hyperkube" apiserver ${swagger_arg} ${anytoken_arg} ${authorizer_arg} ${priv_arg} ${runtime_config}\
+    APISERVER_LOG=${LOG_DIR}/kube-apiserver.log
+    ${CONTROLPLANE_SUDO} "${GO_OUT}/hyperkube" apiserver ${swagger_arg} ${audit_arg} ${anytoken_arg} ${authorizer_arg} ${priv_arg} ${runtime_config}\
       ${advertise_address} \
       --v=${LOG_LEVEL} \
       --cert-dir="${CERT_DIR}" \
@@ -511,11 +540,13 @@ function start_controller_manager {
       node_cidr_args="--allocate-node-cidrs=true --cluster-cidr=10.1.0.0/16 "
     fi
 
-    CTLRMGR_LOG=/tmp/kube-controller-manager.log
+    CTLRMGR_LOG=${LOG_DIR}/kube-controller-manager.log
     ${CONTROLPLANE_SUDO} "${GO_OUT}/hyperkube" controller-manager \
       --v=${LOG_LEVEL} \
       --service-account-private-key-file="${SERVICE_ACCOUNT_KEY}" \
       --root-ca-file="${ROOT_CA_FILE}" \
+      --cluster-signing-cert-file="${ROOT_CA_FILE}" \
+      --cluster-signing-key-file="${ROOT_CA_KEY}" \
       --enable-hostpath-provisioner="${ENABLE_HOSTPATH_PROVISIONER}" \
       ${node_cidr_args} \
       --pvclaimbinder-sync-period="${CLAIM_BINDER_SYNC_PERIOD}" \
@@ -529,7 +560,7 @@ function start_controller_manager {
 }
 
 function start_kubelet {
-    KUBELET_LOG=/tmp/kubelet.log
+    KUBELET_LOG=${LOG_DIR}/kubelet.log
     mkdir -p ${POD_MANIFEST_PATH} || true
 
     priv_arg=""
@@ -657,7 +688,7 @@ function start_kubelet {
 }
 
 function start_kubeproxy {
-    PROXY_LOG=/tmp/kube-proxy.log
+    PROXY_LOG=${LOG_DIR}/kube-proxy.log
     sudo "${GO_OUT}/hyperkube" proxy \
       --v=${LOG_LEVEL} \
       --hostname-override="${HOSTNAME_OVERRIDE}" \
@@ -666,7 +697,7 @@ function start_kubeproxy {
       --master="https://${API_HOST}:${API_SECURE_PORT}" >"${PROXY_LOG}" 2>&1 &
     PROXY_PID=$!
 
-    SCHEDULER_LOG=/tmp/kube-scheduler.log
+    SCHEDULER_LOG=${LOG_DIR}/kube-scheduler.log
     ${CONTROLPLANE_SUDO} "${GO_OUT}/hyperkube" scheduler \
       --v=${LOG_LEVEL} \
       --kubeconfig "$CERT_DIR"/scheduler.kubeconfig \
@@ -678,19 +709,6 @@ function start_kubedns {
     if [[ "${ENABLE_CLUSTER_DNS}" = true ]]; then
         echo "Creating kube-system namespace"
         sed -e "s/{{ pillar\['dns_domain'\] }}/${DNS_DOMAIN}/g" "${KUBE_ROOT}/cluster/addons/dns/kubedns-controller.yaml.in" >| kubedns-deployment.yaml
-        if [[ "${FEDERATION:-}" == "true" ]]; then
-          FEDERATIONS_DOMAIN_MAP="${FEDERATIONS_DOMAIN_MAP:-}"
-          if [[ -z "${FEDERATIONS_DOMAIN_MAP}" && -n "${FEDERATION_NAME:-}" && -n "${DNS_ZONE_NAME:-}" ]]; then
-            FEDERATIONS_DOMAIN_MAP="${FEDERATION_NAME}=${DNS_ZONE_NAME}"
-          fi
-          if [[ -n "${FEDERATIONS_DOMAIN_MAP}" ]]; then
-            sed -i -e "s/{{ pillar\['federations_domain_map'\] }}/- --federations=${FEDERATIONS_DOMAIN_MAP}/g" kubedns-deployment.yaml
-          else
-            sed -i -e "/{{ pillar\['federations_domain_map'\] }}/d" kubedns-deployment.yaml
-          fi
-        else
-          sed -i -e "/{{ pillar\['federations_domain_map'\] }}/d" kubedns-deployment.yaml
-        fi
         sed -e "s/{{ pillar\['dns_server'\] }}/${DNS_SERVER_IP}/g" "${KUBE_ROOT}/cluster/addons/dns/kubedns-svc.yaml.in" >| kubedns-svc.yaml
         
         # TODO update to dns role once we have one.
@@ -702,6 +720,16 @@ function start_kubedns {
         ${KUBECTL} --kubeconfig="${CERT_DIR}/admin.kubeconfig" --namespace=kube-system create -f kubedns-svc.yaml
         echo "Kube-dns deployment and service successfully deployed."
         rm  kubedns-deployment.yaml kubedns-svc.yaml
+    fi
+}
+
+function start_kubedashboard {
+    if [[ "${ENABLE_CLUSTER_DASHBOARD}" = true ]]; then
+        echo "Creating kubernetes-dashboard"       
+        # use kubectl to create the dashboard
+        ${KUBECTL} --kubeconfig="${CERT_DIR}/admin.kubeconfig" create -f ${KUBE_ROOT}/cluster/addons/dashboard/dashboard-controller.yaml
+        ${KUBECTL} --kubeconfig="${CERT_DIR}/admin.kubeconfig" create -f ${KUBE_ROOT}/cluster/addons/dashboard/dashboard-service.yaml
+        echo "kubernetes-dashboard deployment and service successfully deployed."
     fi
 }
 
@@ -738,6 +766,10 @@ Logs:
   ${PROXY_LOG:-}
   ${SCHEDULER_LOG:-}
 EOF
+fi
+
+if [[ "${ENABLE_APISERVER_BASIC_AUDIT:-}" = true ]]; then
+  echo "  ${APISERVER_BASIC_AUDIT_LOG}"
 fi
 
 if [[ "${START_MODE}" == "all" ]]; then
@@ -777,7 +809,9 @@ fi
 }
 
 # validate that etcd is: not running, in path, and has minimum required version.
-kube::etcd::validate
+if [[ "${START_MODE}" != "kubeletonly" ]]; then
+  kube::etcd::validate
+fi
 
 if [ "${CONTAINER_RUNTIME}" == "docker" ] && ! kube::util::ensure_docker_daemon_connectivity; then
   exit 1
@@ -792,7 +826,7 @@ if [[ "${START_MODE}" != "kubeletonly" ]]; then
 fi
 
 kube::util::test_openssl_installed
-kube::util::test_cfssl_installed
+kube::util::ensure-cfssl
 
 ### IF the user didn't supply an output/ for the build... Then we detect.
 if [ "$GO_OUT" == "" ]; then
@@ -813,6 +847,7 @@ if [[ "${START_MODE}" != "kubeletonly" ]]; then
   start_controller_manager
   start_kubeproxy
   start_kubedns
+  start_kubedashboard
 fi
 
 if [[ "${START_MODE}" != "nokubelet" ]]; then
@@ -845,5 +880,3 @@ print_success
 if [[ "${ENABLE_DAEMON}" = false ]]; then
   while true; do sleep 1; done
 fi
-
-

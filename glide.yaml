@@ -1,4 +1,4 @@
-package: github.com/openshift/brokersdk
+package: github.com/openshift/open-service-broker-sdk
 import:
 - package: github.com/coreos/etcd
 - package: github.com/ghodss/yaml
@@ -16,6 +16,7 @@ import:
 - package: k8s.io/client-go
 - package: k8s.io/apimachinery
 - package: k8s.io/apiserver
+  version: 4b7a66ff7eb9796e25668e282eb8e8d393d81107
 - package: github.com/ugorji/go
   subpackages:
   - codec/codecgen
