@@ -108,12 +108,12 @@ func (serverOptions BrokerServerOptions) RunServer(stopCh <-chan struct{}) error
 
 	// server configuration options
 	glog.Info("Setting up secure serving options")
-	if err := serverOptions.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", net.ParseIP("127.0.0.1")); err != nil {
+	if err := serverOptions.RecommendedOptions.SecureServing.MaybeDefaultWithSelfSignedCerts("localhost", nil, []net.IP{net.ParseIP("127.0.0.1")}); err != nil {
 		glog.Errorf("Error creating self-signed certificates: %v", err)
 		return err
 	}
 	glog.V(4).Info("Configuring generic API server")
-	genericconfig := genericapiserver.NewConfig().WithSerializer(apiserver.Codecs)
+	genericconfig := genericapiserver.NewConfig(apiserver.Codecs)
 
 	serverOptions.RecommendedOptions.ApplyTo(genericconfig)
 
