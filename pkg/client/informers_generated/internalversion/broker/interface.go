@@ -19,8 +19,8 @@ limitations under the License.
 package broker
 
 import (
-	internalversion "github.com/openshift/brokersdk/pkg/client/informers_generated/internalversion/broker/internalversion"
-	internalinterfaces "github.com/openshift/brokersdk/pkg/client/informers_generated/internalversion/internalinterfaces"
+	internalversion "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/internalversion/broker/internalversion"
+	internalinterfaces "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/internalversion/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

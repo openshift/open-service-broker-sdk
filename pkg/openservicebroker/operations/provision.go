@@ -5,9 +5,9 @@ import (
 
 	"github.com/golang/glog"
 
-	broker "github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker"
-	"github.com/openshift/brokersdk/pkg/openservicebroker"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	brokerapi "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
 )
 
 // Provision is an implementation of the service broker provision api

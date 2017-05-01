@@ -17,7 +17,7 @@ limitations under the License.
 package fake
 
 import (
-	internalversion "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
+	internalversion "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset/typed/broker/internalversion"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

@@ -20,7 +20,7 @@ package internalversion
 
 import (
 	"fmt"
-	broker "github.com/openshift/brokersdk/pkg/apis/broker"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )

@@ -25,7 +25,7 @@ ROOT           = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 BINDIR        ?= bin
 BUILD_DIR     ?= build
 COVERAGE      ?= $(CURDIR)/coverage.html
-BROKER_PKG     = github.com/openshift/brokersdk
+BROKER_PKG     = github.com/openshift/open-service-broker-sdk
 TOP_SRC_DIRS   = cmd pkg
 SRC_DIRS       = $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*.go \
                    -exec dirname {} \\; | sort | uniq")
@@ -47,7 +47,7 @@ ARCH?=amd64
 
 GO_BUILD       = env GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -i $(GOFLAGS) \
                    -ldflags "-X $(BROKER_PKG)/pkg.VERSION=$(VERSION)"
-BASE_PATH      = $(ROOT:/src/github.com/openshift/brokersdk/=)
+BASE_PATH      = $(ROOT:/src/github.com/openshift/open-service-broker-sdk/=)
 export GOPATH  = $(BASE_PATH):$(ROOT)/vendor
 
 REGISTRY      ?= quay.io/kubernetes-service-catalog/
@@ -123,7 +123,7 @@ $(BINDIR)/informer-gen: .init
 		--go-header-file "vendor/github.com/kubernetes/repo-infra/verify/boilerplate/boilerplate.go.txt" \
 		--input-dirs "$(BROKER_PKG)/pkg/apis/broker" \
 		--input-dirs "$(BROKER_PKG)/pkg/apis/broker/v1alpha1" \
-		--bounding-dirs "github.com/openshift/brokersdk" \
+		--bounding-dirs "github.com/openshift/open-service-broker-sdk" \
 		--output-file-base zz_generated.deepcopy
 	# Generate conversions
 	$(BINDIR)/conversion-gen \

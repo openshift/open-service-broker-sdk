@@ -30,9 +30,9 @@ import (
 
 	"k8s.io/kubernetes/pkg/api/unversioned"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerapi "github.com/openshift/brokersdk/pkg/apis/broker"
-	brokerclientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	brokerapi "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	brokerclientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset"
 )
 
 // Controller describes a controller that processes service instance

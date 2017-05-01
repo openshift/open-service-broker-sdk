@@ -21,7 +21,7 @@ limitations under the License.
 package v1alpha1
 
 import (
-	broker "github.com/openshift/brokersdk/pkg/apis/broker"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	conversion "k8s.io/apimachinery/pkg/conversion"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	api "k8s.io/client-go/pkg/api"

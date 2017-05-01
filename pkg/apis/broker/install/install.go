@@ -17,8 +17,8 @@ limitations under the License.
 package install
 
 import (
-	"github.com/openshift/brokersdk/pkg/apis/broker"
-	"github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
 	"k8s.io/apimachinery/pkg/apimachinery/announced"
 	"k8s.io/apimachinery/pkg/apimachinery/registered"
 	"k8s.io/apimachinery/pkg/runtime"

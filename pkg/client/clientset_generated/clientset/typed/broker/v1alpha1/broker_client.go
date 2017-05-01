@@ -17,8 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	v1alpha1 "github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	"github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset/scheme"
+	v1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
+	"github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset/scheme"
 	serializer "k8s.io/apimachinery/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )

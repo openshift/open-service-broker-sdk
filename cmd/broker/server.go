@@ -31,10 +31,10 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericserveroptions "k8s.io/apiserver/pkg/server/options"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker/v1alpha1"
-	"github.com/openshift/brokersdk/pkg/apiserver"
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/internalclientset"
-	"github.com/openshift/brokersdk/pkg/controller"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1"
+	"github.com/openshift/open-service-broker-sdk/pkg/apiserver"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset"
+	"github.com/openshift/open-service-broker-sdk/pkg/controller"
 )
 
 // BrokerServerOptions contains the aggregation of configuration structs for

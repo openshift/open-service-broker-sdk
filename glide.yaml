@@ -1,4 +1,4 @@
-package: github.com/openshift/brokersdk
+package: github.com/openshift/open-service-broker-sdk
 import:
 - package: github.com/coreos/etcd
 - package: github.com/ghodss/yaml

@@ -17,9 +17,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
-	brokerv1alpha1 "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1"
-	fakebrokerv1alpha1 "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1/fake"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset"
+	brokerv1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1"
+	fakebrokerv1alpha1 "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset/typed/broker/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

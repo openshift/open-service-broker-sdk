@@ -23,7 +23,7 @@ import (
 	"k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
 
-	"github.com/openshift/brokersdk/pkg/apis/broker"
+	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 )
 
 // NewREST returns a RESTStorage object that will work against broker API resources.

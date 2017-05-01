@@ -19,7 +19,7 @@ limitations under the License.
 package internalinterfaces
 
 import (
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	cache "k8s.io/client-go/tools/cache"
 	time "time"

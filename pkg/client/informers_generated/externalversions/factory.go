@@ -19,9 +19,9 @@ limitations under the License.
 package externalversions
 
 import (
-	clientset "github.com/openshift/brokersdk/pkg/client/clientset_generated/clientset"
-	broker "github.com/openshift/brokersdk/pkg/client/informers_generated/externalversions/broker"
-	internalinterfaces "github.com/openshift/brokersdk/pkg/client/informers_generated/externalversions/internalinterfaces"
+	clientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/clientset"
+	broker "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/externalversions/broker"
+	internalinterfaces "github.com/openshift/open-service-broker-sdk/pkg/client/informers_generated/externalversions/internalinterfaces"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
