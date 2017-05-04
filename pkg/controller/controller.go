@@ -28,8 +28,6 @@ import (
 	kapi "k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/tools/cache"
 
-	"k8s.io/kubernetes/pkg/api/unversioned"
-
 	"github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	brokerapi "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	brokerclientset "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/internalclientset"
@@ -100,7 +98,7 @@ func (c *controller) serviceInstanceAdd(obj interface{}) {
 	condition := brokerapi.ServiceInstanceCondition{
 		Type:               brokerapi.ServiceInstanceReady,
 		Status:             kapi.ConditionTrue,
-		LastTransitionTime: unversioned.Time{time.Now()},
+		LastTransitionTime: metav1.Now(),
 		Reason:             "ServiceProvisioned",
 		Message:            "This service has been provisioned",
 	}

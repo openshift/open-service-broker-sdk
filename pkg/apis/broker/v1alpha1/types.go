@@ -20,8 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	kapi "k8s.io/client-go/pkg/api/v1"
-
-	"k8s.io/kubernetes/pkg/api/unversioned"
 )
 
 // ServiceInstanceList is a list of ServiceInstance objects.
@@ -64,7 +62,7 @@ type ServiceInstanceCondition struct {
 	Status kapi.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
 	// LastTransitionTime is the last time a condition status transitioned from
 	// one state to another.
-	LastTransitionTime unversioned.Time `json:"lastTransitionTime" protobuf:"bytes,3,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime" protobuf:"bytes,3,opt,name=lastTransitionTime"`
 	// Reason is a brief machine readable explanation for the condition's last
 	// transition.
 	Reason string `json:"reason" protobuf:"bytes,4,opt,name=reason"`
