@@ -50,8 +50,6 @@ GO_BUILD       = env GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -i $(GOFLAGS) \
 BASE_PATH      = $(ROOT:/src/github.com/openshift/open-service-broker-sdk/=)
 export GOPATH  = $(BASE_PATH):$(ROOT)/vendor
 
-REGISTRY      ?= quay.io/kubernetes-service-catalog/
-
 # precheck to avoid kubernetes-incubator/service-catalog#361
 $(if $(realpath vendor/k8s.io/kubernetes/vendor), \
 	$(error the vendor directory exists in the kubernetes \
@@ -68,11 +66,11 @@ NON_VENDOR_DIRS = $(shell glide nv)
 # Some will have dedicated targets to make it easier to type, for example
 # "apiserver" instead of "bin/apiserver".
 #########################################################################
-build: .init .generate_files broker
+build: .generate_files broker
 
 broker: $(BINDIR)/broker
-$(BINDIR)/broker: .init .generate_files $(NEWEST_GO_FILE)
-$(BINDIR)/broker: .init $(NEWEST_GO_FILE)
+$(BINDIR)/broker: .generate_files $(NEWEST_GO_FILE)
+$(BINDIR)/broker: $(NEWEST_GO_FILE)
 	$(GO_BUILD) -o $@ $(BROKER_PKG)/cmd/broker
 
 # This section contains the code generation stuff
@@ -85,29 +83,26 @@ $(BINDIR)/broker: .init $(NEWEST_GO_FILE)
                 $(BINDIR)/informer-gen
 	touch $@
 
-$(BINDIR)/defaulter-gen: .init
+$(BINDIR)/defaulter-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/defaulter-gen
 
-$(BINDIR)/deepcopy-gen: .init
+$(BINDIR)/deepcopy-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/deepcopy-gen
 
-$(BINDIR)/conversion-gen: .init
+$(BINDIR)/conversion-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/conversion-gen
 
-$(BINDIR)/client-gen: .init
+$(BINDIR)/client-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/client-gen
 
-$(BINDIR)/lister-gen: .init
+$(BINDIR)/lister-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/lister-gen
 
-$(BINDIR)/informer-gen: .init
+$(BINDIR)/informer-gen:
 	go build -o $@ $(BROKER_PKG)/vendor/k8s.io/kubernetes/cmd/libs/go2idl/informer-gen
 
-#$(BINDIR)/openapi-gen: vendor/k8s.io/kubernetes/cmd/libs/go2idl/openapi-gen
-#	$(DOCKER_CMD) go build -o $@ $(BROKER_PKG)/$^
-
 # Regenerate all files if the gen exes changed or any "types.go" files changed
-.generate_files: .init .generate_exes $(TYPES_FILES)
+.generate_files: .generate_exes $(TYPES_FILES)
 	# Generate defaults
 	$(BINDIR)/defaulter-gen \
 		--v 1 --logtostderr \
@@ -132,70 +127,43 @@ $(BINDIR)/informer-gen: .init
 		--input-dirs "$(BROKER_PKG)/pkg/apis/broker" \
 		--input-dirs "$(BROKER_PKG)/pkg/apis/broker/v1alpha1" \
 		--output-file-base zz_generated.conversion
-	# the previous three directories will be changed from kubernetes to apimachinery in the future
 	# generate all pkg/client contents
 	$(BUILD_DIR)/update-client-gen.sh
-
-# Some prereq stuff
-###################
-.init: glide.yaml
-	glide install --strip-vendor --strip-vcs --update-vendored
-	touch $@
 
 # Util targets
 ##############
 .PHONY: verify verify-client-gen 
-verify: .init .generate_files verify-client-gen
+verify: .generate_files verify-client-gen
 	@echo Running gofmt:
 	@gofmt -l -s $(TOP_SRC_DIRS) > .out 2>&1 || true
 	@bash -c '[ "`cat .out`" == "" ] || \
 	  (echo -e "\n*** Please 'gofmt' the following:" ; cat .out ; echo ; false)'
 	@rm .out
-	@#
-#	@echo Running golint and govet:
-#	@# Exclude the generated (zz) files for now, as well as defaults.go (it
-#	@# observes conventions from upstream that will not pass lint checks).
-#	@sh -c \
-#	  'for i in $$(find $(TOP_SRC_DIRS) -name *.go \
-#	    | grep -v generated \
-#	    | grep -v ^pkg/client/ \
-#	    | grep -v v1alpha1/defaults.go); \
-#	  do \
-#	   golint --set_exit_status $$i || exit 1; \
-#	  done'
-#	@#
-#	go vet $(NON_VENDOR_DIRS)
+	@
 	@echo Running repo-infra verify scripts
-#	@vendor/github.com/kubernetes/repo-infra/verify/verify-boilerplate.sh --rootdir=. | grep -v generated > .out 2>&1 || true
-#	@bash -c '[ "`cat .out`" == "" ] || (cat .out ; false)'
-#	@rm .out
-	@#
 	@echo Running href checker:
 	@build/verify-links.sh
 	@echo Running errexit checker:
 	@build/verify-errexit.sh
 
-verify-client-gen: .init .generate_files
+verify-client-gen: .generate_files
 	$(BUILD_DIR)/verify-client-gen.sh
 
-format: .init
+format:
 	gofmt -w -s $(TOP_SRC_DIRS)
 
-test: .init build test-unit
+test: build test-unit
 
-test-unit: .init build
+test-unit: build
 	@echo Running tests:
 	go test $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
 
-clean: clean-bin clean-deps
+clean: clean-bin
 
 clean-bin:
 	rm -rf $(BINDIR)
 	rm -f .generate_exes
-
-clean-deps:
-	rm -f .init
 
 # Building Docker Images for our executables
 ############################################

@@ -32,14 +32,14 @@ ${BINDIR}/client-gen "$@" \
 	      --go-header-file "vendor/github.com/kubernetes/repo-infra/verify/boilerplate/boilerplate.go.txt"
 # Generate the versioned clientset (pkg/client/clientset_generated/clientset)
 ${BINDIR}/client-gen "$@" \
-              --input-base "github.com/openshift/open-service-broker-sdk/pkg/apis/" \
-	      --input "broker/v1alpha1" \
+		  --input-base "github.com/openshift/open-service-broker-sdk/pkg/apis/" \
+		  --input "broker/v1alpha1" \
 	      --clientset-path "github.com/openshift/open-service-broker-sdk/pkg/client/clientset_generated/" \
 	      --clientset-name "clientset" \
 	      --go-header-file "vendor/github.com/kubernetes/repo-infra/verify/boilerplate/boilerplate.go.txt"
 # generate lister
 ${BINDIR}/lister-gen "$@" \
-	      --input-dirs="github.com/openshift/open-service-broker-sdk/pkg/apis/broker" \
+		  --input-dirs="github.com/openshift/open-service-broker-sdk/pkg/apis/broker" \
 	      --input-dirs="github.com/openshift/open-service-broker-sdk/pkg/apis/broker/v1alpha1" \
 	      --output-package "github.com/openshift/open-service-broker-sdk/pkg/client/listers_generated" \
 	      --go-header-file "vendor/github.com/kubernetes/repo-infra/verify/boilerplate/boilerplate.go.txt"
