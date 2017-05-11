@@ -1,0 +1,18 @@
+language: go
+sudo: required
+
+go:
+  - 1.7.x
+  - master
+
+
+before_install:
+  - sudo apt-get install realpath -y
+
+script:
+  - make build verify
+
+matrix:
+  allow_failures:
+  - go: master
+  fast_finish: true
