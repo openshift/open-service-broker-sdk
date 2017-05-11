@@ -48,7 +48,6 @@ ARCH?=amd64
 GO_BUILD       = env GOOS=$(PLATFORM) GOARCH=$(ARCH) go build -i $(GOFLAGS) \
                    -ldflags "-X $(BROKER_PKG)/pkg.VERSION=$(VERSION)"
 BASE_PATH      = $(ROOT:/src/github.com/openshift/open-service-broker-sdk/=)
-export GOPATH  = $(BASE_PATH):$(ROOT)/vendor
 
 # precheck to avoid kubernetes-incubator/service-catalog#361
 $(if $(realpath vendor/k8s.io/kubernetes/vendor), \
