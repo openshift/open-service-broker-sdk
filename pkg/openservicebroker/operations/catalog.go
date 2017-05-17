@@ -17,14 +17,14 @@ func (b *BrokerOperations) Catalog() *openservicebroker.Response {
 
 	service_plans := make([]openservicebroker.Plan, 1)
 	service_plans[0] = openservicebroker.Plan{
-		Name:        "gold plan",
-		ID:          "gold_plan_id",
+		Name:        "gold-plan",
+		ID:          "gold-plan-id",
 		Description: "gold plan description",
 		Bindable:    true,
 		Free:        true,
 	}
 	services[0] = &openservicebroker.Service{
-		Name:        "service name",
+		Name:        "service-name",
 		ID:          "serviceUUID",
 		Description: "service description",
 		Tags:        []string{"tag1", "tag2"},
