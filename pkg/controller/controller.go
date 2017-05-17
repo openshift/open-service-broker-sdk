@@ -93,6 +93,21 @@ func (c *controller) serviceInstanceAdd(obj interface{}) {
 	if instance == nil || !ok {
 		return
 	}
+
+	// Controllers periodically get a full relist of all resources they are watching,
+	// so we need to make sure we properly no-op service instances we've already
+	// handled previously.
+	for _, condition := range instance.Status.Conditions {
+		if condition.Type == brokerapi.ServiceInstanceReady && condition.Status == kapi.ConditionTrue {
+			// This provision request has already been fulfilled.
+			return
+		}
+		if condition.Type == brokerapi.ServiceInstanceFailed && condition.Status == kapi.ConditionTrue {
+			// This provision request has already failed.
+			return
+		}
+	}
+
 	glog.Infof("controller processing provision request for instance %s", instance.Name)
 	// add the Ready condition to the service instance.
 	condition := brokerapi.ServiceInstanceCondition{
