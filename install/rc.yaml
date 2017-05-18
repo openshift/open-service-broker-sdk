@@ -23,6 +23,7 @@ spec:
       containers:
       - name: brokersdk
         image: brokersdk
+        imagePullPolicy: IfNotPresent
         volumeMounts:
          - name: brokersdk-data
            mountPath: /data
