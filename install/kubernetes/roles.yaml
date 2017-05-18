@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: ClusterRole
+  metadata:
+    name: system:auth-delegator
+  rules:
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - tokenreviews
+    verbs:
+    - create
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - subjectaccessreviews
+    verbs:
+    - create
+- apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: Role
+  metadata:
+    name: extension-apiserver-authentication-reader
+    namespace: kube-system
+  rules:
+  - apiGroups:
+    - ""
+    resourceNames:
+    - extension-apiserver-authentication
+    resources:
+    - configmaps
+    verbs:
+    - get
+- kind: ClusterRole
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: service-broker-caller
+  rules:
+  - nonResourceURLs:
+    - /broker/sdkbroker.broker.io/*
+    verbs:
+    - get
+    - put
+    - delete
+    - post
+- kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: service-broker-caller-binding
+  roleRef:
+    kind: ClusterRole
+    name: service-broker-caller
+    apiGroup: rbac.authorization.k8s.io
+  subjects:    
+  - kind: Group
+    name: system:unauthenticated
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: system:authenticated
+    apiGroup: rbac.authorization.k8s.io    
+  - kind: Group
+    name: system:anonymous        
+    apiGroup: rbac.authorization.k8s.io
+- apiVersion: rbac.authorization.k8s.io/v1beta1
+  kind: ClusterRole
+  metadata:
+    name: service-broker-resource
+  rules:
+  - apiGroups:
+    - sdkbroker.broker.k8s.io
+    resources:
+    - "*"
+    verbs:
+    - create
+    - get
+    - update
+    - delete
+    - list
+- kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: service-broker-resource-binding
+  roleRef:
+    kind: ClusterRole
+    name: service-broker-resource
+    apiGroup: rbac.authorization.k8s.io
+  subjects:    
+  - kind: Group
+    name: system:unauthenticated
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: system:authenticated
+    apiGroup: rbac.authorization.k8s.io    
+  - kind: Group
+    name: system:anonymous        
+    apiGroup: rbac.authorization.k8s.io
+  
