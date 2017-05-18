@@ -22,8 +22,7 @@ spec:
         emptyDir: {}
       containers:
       - name: brokersdk
-        image: maleck13/service-broker-mongo:1.4
-        imagePullPolicy: IfNotPresent
+        image: brokersdk
         volumeMounts:
          - name: brokersdk-data
            mountPath: /data
