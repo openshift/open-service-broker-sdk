@@ -34,8 +34,10 @@ what the lifecycle of a project based on this SDK should look like.
 $ make images
 $ # start up an openshift/kube cluster
 $ # have admin credentials
-$ cd test-scripts
-$ ./install-broker.sh
+$ cd install
+$ cd <kubernetes|openshift>
+$ ./install.sh
+$ cd ../../test-scripts
 $ ./provision.sh
 $ ./bind.sh
 $ ./unbind.sh
