@@ -6,10 +6,13 @@ if [[ -z $1 || -z $2 ]]; then
 fi
 
 OS_TARGET=`uname -s`  
-BACKUP=""
+REPLACE="s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g"
+
 if  [ "$OS_TARGET" == "Darwin" ]; then
-  BACKUP="''"
+  find . -type f -name *.go -exec sed -i '' "${REPLACE}" {} +
+  sed -i ''  "${REPLACE}" Makefile
+  exit
 fi
   
-find . -type f -name *.go -exec sed -i $BACKUP  "s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g" {} +
-  sed -i $BACKUP  "s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g" Makefile
+find . -type f -name *.go -exec sed -i "${REPLACE}" {} +
+sed -i  "${REPLACE}" Makefile
