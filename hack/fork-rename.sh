@@ -5,7 +5,14 @@ if [[ -z $1 || -z $2 ]]; then
   exit 1
 fi
 
-find . -type f -name *.go -exec sed -i "s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g" {} +
+OS_TARGET=`uname -s`  
+REPLACE="s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g"
 
-sed -i "s#github.com/openshift/open-service-broker-sdk#github.com/$1/$2#g" Makefile
-
+if  [ "$OS_TARGET" == "Darwin" ]; then
+  find . -type f -name *.go -exec sed -i '' "${REPLACE}" {} +
+  sed -i ''  "${REPLACE}" Makefile
+  exit
+fi
+  
+find . -type f -name *.go -exec sed -i "${REPLACE}" {} +
+sed -i  "${REPLACE}" Makefile
