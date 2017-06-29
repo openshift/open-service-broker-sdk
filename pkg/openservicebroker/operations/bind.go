@@ -12,14 +12,14 @@ import (
 
 // Bind handles bind requests from the service catalog by returning
 // a bind response with credentials for the service instance.
-func (b *BrokerOperations) Bind(instance_id, binding_id string, breq *openservicebroker.BindRequest) *openservicebroker.Response {
+func (b *BrokerOperations) Bind(instanceID, bindingID string, breq *openservicebroker.BindRequest) *openservicebroker.Response {
 	// Find the service instance that is being bound to
-	si, err := b.Client.ServiceInstances(broker.Namespace).Get(instance_id, metav1.GetOptions{})
+	si, err := b.Client.Broker().ServiceInstances(broker.Namespace).Get(instanceID, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return &openservicebroker.Response{http.StatusGone, &openservicebroker.BindResponse{}, nil}
+			return &openservicebroker.Response{Code: http.StatusGone, Body: &openservicebroker.BindResponse{}, Err: nil}
 		}
-		return &openservicebroker.Response{http.StatusInternalServerError, nil, err}
+		return &openservicebroker.Response{Code: http.StatusInternalServerError, Body: nil, Err: err}
 	}
 
 	// in principle, bind should alter state somewhere

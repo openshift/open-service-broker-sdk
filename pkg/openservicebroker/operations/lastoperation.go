@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"errors"
 	"net/http"
 
 	kerrors "k8s.io/apimachinery/pkg/api/errors"
@@ -14,23 +13,18 @@ import (
 )
 
 // LastOperation is an implementation of the service broker last operation api.
-func (b *BrokerOperations) LastOperation(instance_id string, operation openservicebroker.Operation) *openservicebroker.Response {
-	// The only operation we can check on is a Provision operation.
-	if operation != openservicebroker.OperationProvisioning {
-		return &openservicebroker.Response{http.StatusBadRequest, nil, errors.New("invalid operation")}
-	}
-
+func (b *BrokerOperations) LastOperation(instanceID string, operation openservicebroker.Operation) *openservicebroker.Response {
 	// Find the ServiceInstance that represents the state of this service instanceid
-	si, err := b.Client.ServiceInstances(broker.Namespace).Get(instance_id, metav1.GetOptions{})
+	si, err := b.Client.Broker().ServiceInstances(broker.Namespace).Get(instanceID, metav1.GetOptions{})
 	if err != nil {
 		if kerrors.IsNotFound(err) {
 			if operation == openservicebroker.OperationDeprovisioning {
-				return &openservicebroker.Response{http.StatusGone, &struct{}{}, nil}
-			} else {
-				return &openservicebroker.Response{http.StatusBadRequest, nil, err}
+				return &openservicebroker.Response{Code: http.StatusGone, Body: &struct{}{}, Err: nil}
 			}
+			return &openservicebroker.Response{Code: http.StatusBadRequest, Body: nil, Err: err}
+
 		}
-		return &openservicebroker.Response{http.StatusInternalServerError, nil, err}
+		return &openservicebroker.Response{Code: http.StatusInternalServerError, Body: nil, Err: err}
 	}
 
 	// Check the conditions on the ServiceInstance to determine the operation state.
@@ -46,5 +40,5 @@ func (b *BrokerOperations) LastOperation(instance_id string, operation openservi
 		}
 	}
 
-	return &openservicebroker.Response{http.StatusOK, &openservicebroker.LastOperationResponse{State: state}, nil}
+	return &openservicebroker.Response{Code: http.StatusOK, Body: &openservicebroker.LastOperationResponse{State: state}, Err: nil}
 }

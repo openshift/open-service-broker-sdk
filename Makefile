@@ -155,7 +155,7 @@ test: build test-unit
 
 test-unit: build
 	@echo Running tests:
-	go test $(UNIT_TEST_FLAGS) \
+	go test -cover $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
 
 clean: clean-bin
