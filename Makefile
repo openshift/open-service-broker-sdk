@@ -158,6 +158,11 @@ test-unit: build
 	go test -cover $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
 
+test-integrations: build
+	@echo Running integrations tests:
+	go test \
+	  $(addprefix $(BROKER_PKG)/,test/integrations)
+
 clean: clean-bin
 
 clean-bin:

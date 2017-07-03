@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package server
 
 import (
 	"flag"
@@ -68,9 +68,8 @@ const (
 	etcdPathPrefix = "/k8s.io/brokersdk"
 )
 
-// NewCommandServer creates a new cobra command to run our server.
-func NewCommandServer(out io.Writer) *cobra.Command {
-	// initalize our sub options.
+// NewBrokerServerOptions returns the default BrokerServerOptions
+func NewBrokerServerOptions() *BrokerServerOptions {
 	recommended := genericserveroptions.NewRecommendedOptions(etcdPathPrefix, apiserver.Scheme, apiserver.Codecs.LegacyCodec(v1alpha1.SchemeGroupVersion))
 	options := &BrokerServerOptions{
 		RecommendedOptions:      recommended,
@@ -80,7 +79,12 @@ func NewCommandServer(out io.Writer) *cobra.Command {
 		AuthenticationOptions:   genericserveroptions.NewDelegatingAuthenticationOptions(),
 		AuthorizationOptions:    genericserveroptions.NewDelegatingAuthorizationOptions(),
 	}
+	return options
+}
 
+// NewCommandServer creates a new cobra command to run our server.
+func NewCommandServer(out io.Writer) *cobra.Command {
+	options := NewBrokerServerOptions()
 	// Set generated SSL cert path correctly
 	//options.SecureServingOptions.ServerCert.CertDirectory = certDirectory
 
