@@ -9,5 +9,5 @@ import (
 // It users a resource client to access the ServiceInstance resources
 // that are used to store instance/binding state information.
 type BrokerOperations struct {
-	Client *clientset.Clientset
+	Client clientset.Interface
 }

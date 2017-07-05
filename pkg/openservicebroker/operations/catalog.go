@@ -12,11 +12,11 @@ func (b *BrokerOperations) Catalog() *openservicebroker.Response {
 
 	services := make([]*openservicebroker.Service, 1)
 
-	service_metadata := make(map[string]interface{})
-	service_metadata["metadata_key1"] = "metadata_value1"
+	serviceMetadata := make(map[string]interface{})
+	serviceMetadata["metadata_key1"] = "metadata_value1"
 
-	service_plans := make([]openservicebroker.Plan, 1)
-	service_plans[0] = openservicebroker.Plan{
+	servicePlans := make([]openservicebroker.Plan, 1)
+	servicePlans[0] = openservicebroker.Plan{
 		Name:        "gold-plan",
 		ID:          "gold-plan-id",
 		Description: "gold plan description",
@@ -29,8 +29,8 @@ func (b *BrokerOperations) Catalog() *openservicebroker.Response {
 		Description: "service description",
 		Tags:        []string{"tag1", "tag2"},
 		Bindable:    true,
-		Metadata:    service_metadata,
-		Plans:       service_plans,
+		Metadata:    serviceMetadata,
+		Plans:       servicePlans,
 	}
-	return &openservicebroker.Response{http.StatusOK, &openservicebroker.CatalogResponse{Services: services}, nil}
+	return &openservicebroker.Response{Code: http.StatusOK, Body: &openservicebroker.CatalogResponse{Services: services}, Err: nil}
 }

@@ -10,7 +10,7 @@ before_install:
   - sudo apt-get install realpath -y
 
 script:
-  - make build verify
+  - make build test verify
 
 matrix:
   allow_failures:
