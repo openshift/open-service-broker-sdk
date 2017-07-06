@@ -1,6 +1,9 @@
 language: go
 sudo: required
 
+services:
+  - docker
+
 go:
   - 1.7.x
   - master
@@ -8,9 +11,10 @@ go:
 
 before_install:
   - sudo apt-get install realpath -y
+  - docker run -d --name=etcd -p 2379:2379 quay.io/coreos/etcd:v3.0.17
 
 script:
-  - make build test verify
+  - make build test test-integrations verify
 
 matrix:
   allow_failures:
