@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/golang/glog"
-
+	"github.com/openshift/open-service-broker-sdk/cmd/broker/server"
 	"k8s.io/apiserver/pkg/util/logs"
 )
 
@@ -29,7 +29,7 @@ func main() {
 	// make sure we print all the logs while shutting down.
 	defer logs.FlushLogs()
 
-	cmd := NewCommandServer(os.Stdout)
+	cmd := server.NewCommandServer(os.Stdout)
 	if err := cmd.Execute(); err != nil {
 		glog.Errorf("server exited unexpectedly (%s)", err)
 		logs.FlushLogs()

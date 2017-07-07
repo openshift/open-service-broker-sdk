@@ -1,6 +1,9 @@
 language: go
 sudo: required
 
+services:
+  - docker
+
 go:
   - 1.7.x
   - master
@@ -10,7 +13,7 @@ before_install:
   - sudo apt-get install realpath -y
 
 script:
-  - make build test verify
+  - make build test test-integration verify
 
 matrix:
   allow_failures:
