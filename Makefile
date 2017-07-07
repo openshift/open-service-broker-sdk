@@ -158,10 +158,13 @@ test-unit: build
 	go test -cover $(UNIT_TEST_FLAGS) \
 	  $(addprefix $(BROKER_PKG)/,$(TEST_DIRS))
 
-test-integrations: build
-	@echo Running integrations tests:
+test-integration: build
+	@echo Starting etcd:
+	docker run --name=brokersdk-etcd -d -p 2379:2379 quay.io/coreos/etcd:v3.0.17
+	@echo Running integration tests:
 	go test \
-	  $(addprefix $(BROKER_PKG)/,test/integrations)
+	  $(addprefix $(BROKER_PKG)/,test/integration)
+	docker stop brokersdk-etcd
 
 clean: clean-bin
 
