@@ -30,6 +30,7 @@ func (b *BrokerOperations) Provision(instanceID string, preq *openservicebroker.
 	_, err := b.Client.Broker().ServiceInstances(broker.Namespace).Create(&si)
 	if err != nil {
 		glog.Errorf("Failed to create a service instance\n:%v\n", err)
+		return &openservicebroker.Response{Code: http.StatusInternalServerError, Body: nil, Err: err}
 	}
 
 	// Use this for async provision flows.  Technically the service instance isn't provisioned
