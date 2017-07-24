@@ -160,7 +160,7 @@ test-unit: build
 
 test-integration: build
 	@echo Starting etcd:
-	docker run --name=brokersdk-etcd -d -p 2379:2379 quay.io/coreos/etcd:v3.0.17
+	docker run --rm -d -p 2379:2379 --name brokersdk-etcd quay.io/coreos/etcd:v3.1.0 /usr/local/bin/etcd --advertise-client-urls http://0.0.0.0:2379 --listen-client-urls http://0.0.0.0:2379
 	@echo Running integration tests:
 	go test \
 	  $(addprefix $(BROKER_PKG)/,test/integration)
