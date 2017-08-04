@@ -62,8 +62,15 @@ const (
 	LastOperationStateFailed     LastOperationState = "failed"
 )
 
+// KubernetesContext is sent as part of a provision or update call to a service broker running in a kubernetes cluter.
+type KubernetesContext struct {
+	Platform  string `json:"platform"`
+	Namespace string `json:"namespace"`
+}
+
 // ProvisionRequest is sent as part of a provision api call
 type ProvisionRequest struct {
+	Context           KubernetesContext `json:"context"`
 	ServiceID         string            `json:"service_id"`
 	PlanID            string            `json:"plan_id"`
 	Parameters        map[string]string `json:"parameters,omitempty"`
@@ -81,6 +88,7 @@ type ProvisionResponse struct {
 type Operation string
 
 type UpdateRequest struct {
+	Context           KubernetesContext `json:"context"`
 	ServiceID         string            `json:"service_id"`
 	PlanID            string            `json:"plan_id,omitempty"`
 	Parameters        map[string]string `json:"parameters,omitempty"`

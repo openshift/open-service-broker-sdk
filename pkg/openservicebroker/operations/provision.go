@@ -6,7 +6,6 @@ import (
 
 	"github.com/golang/glog"
 
-	broker "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	brokerapi "github.com/openshift/open-service-broker-sdk/pkg/apis/broker"
 	"github.com/openshift/open-service-broker-sdk/pkg/openservicebroker"
 )
@@ -27,7 +26,7 @@ func (b *BrokerOperations) Provision(instanceID string, preq *openservicebroker.
 
 	// Create the ServiceInstance object that represents this service instance.  The
 	// controller will see the request and progress it from there.
-	_, err := b.Client.Broker().ServiceInstances(broker.Namespace).Create(&si)
+	_, err := b.Client.Broker().ServiceInstances(preq.Context.Namespace).Create(&si)
 	if err != nil {
 		glog.Errorf("Failed to create a service instance\n:%v\n", err)
 		return &openservicebroker.Response{Code: http.StatusInternalServerError, Body: nil, Err: err}
