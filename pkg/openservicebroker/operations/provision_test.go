@@ -23,6 +23,10 @@ func TestProvision(t *testing.T) {
 			ExpectError: false,
 			Code:        202,
 			Request: &openservicebroker.ProvisionRequest{
+				Context: openservicebroker.KubernetesContext{
+					Platform:  "kubernetes",
+					Namespace: "test",
+				},
 				ServiceID:         "test",
 				PlanID:            "test",
 				Parameters:        map[string]string{},
@@ -37,6 +41,10 @@ func TestProvision(t *testing.T) {
 			ExpectError: true,
 			Code:        422,
 			Request: &openservicebroker.ProvisionRequest{
+				Context: openservicebroker.KubernetesContext{
+					Platform:  "kubernetes",
+					Namespace: "test",
+				},
 				ServiceID:         "test",
 				PlanID:            "test",
 				Parameters:        map[string]string{},

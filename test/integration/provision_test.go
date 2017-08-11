@@ -26,6 +26,10 @@ func TestProvisionEndpoint(t *testing.T) {
 		{
 			Name: "it should provision ok",
 			ProvisionReq: &openservicebroker.ProvisionRequest{
+				Context: openservicebroker.KubernetesContext{
+					Platform:  "kubernetes",
+					Namespace: "test",
+				},
 				AcceptsIncomplete: true,
 				PlanID:            "thePlan",
 				OrganizationID:    "theOrg",
